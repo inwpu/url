@@ -2,9 +2,6 @@ name = "url"
 main = "url.js"
 compatibility_date = "2025-11-20"
 workers_dev = true
-routes = [
-  "url.hxorz.cn/*",
-]
 
 [observability]
 enabled = true
