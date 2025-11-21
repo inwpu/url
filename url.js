@@ -986,27 +986,22 @@ docker info | grep -A 5 "Registry Mirrors"</pre>
     function buildCommands(platform, url) {
       if (!platform || !url) return "";
       const cmds = [];
-      let host = "";
-      try {
-        host = new URL(url).host;
-      } catch (e) {
-        return "";
-      }
-
       if (platform.id === "docker") {
         const noScheme = url.replace(/^https?:\\/\\//i, "");
-        cmds.push("# 配置 Docker 镜像加速（daemon.json）");
-        cmds.push('echo \'{"registry-mirrors": ["https://' + host + '"]}\' | sudo tee /etc/docker/daemon.json');
-        cmds.push("sudo systemctl daemon-reload && sudo systemctl restart docker");
-        cmds.push("");
-        cmds.push("# 拉取镜像");
+        cmds.push("# Docker 拉取镜像");
         cmds.push("docker pull " + noScheme);
+        cmds.push("");
+        cmds.push("# 查看镜像信息");
+        cmds.push("docker images " + noScheme.split('/').pop().split(':')[0]);
         cmds.push("");
         cmds.push("# 运行容器（交互式）");
         cmds.push("docker run -it --rm " + noScheme);
         cmds.push("");
         cmds.push("# 运行容器（后台模式）");
         cmds.push("docker run -d --name mycontainer " + noScheme);
+        cmds.push("");
+        cmds.push("# 使用 docker-compose（需自行创建 docker-compose.yml）");
+        cmds.push("docker-compose pull && docker-compose up -d");
       } else if (["github","gist","gitlab","gitea","codeberg","sf","aosp","homebrew"].includes(platform.id)) {
         // 判断是否为文件下载链接
         const isFileLink = /\\.(zip|tar\\.gz|tgz|tar\\.bz2|tar\\.xz|exe|dmg|pkg|deb|rpm|apk|jar|war)$/i.test(url) || url.includes('/releases/download/') || url.includes('/archive/');
@@ -1023,19 +1018,19 @@ docker info | grep -A 5 "Registry Mirrors"</pre>
           cmds.push("# 下载并解压（如果是压缩包）");
           cmds.push("curl -L '" + url + "' | tar -xz");
         } else {
-          cmds.push("# 配置 Git 全局代理加速");
-          cmds.push("git config --global url.'https://" + host + "/gh/'.insteadOf 'https://github.com/'");
-          cmds.push("");
-          cmds.push("# 克隆仓库");
+          cmds.push("# Git 克隆仓库");
           cmds.push("git clone " + url);
           cmds.push("");
-          cmds.push("# 浅克隆（速度更快）");
+          cmds.push("# Git 克隆仓库（浅克隆，速度更快）");
           cmds.push("git clone --depth 1 " + url);
           cmds.push("");
-          cmds.push("# 包含子模块");
+          cmds.push("# Git 克隆仓库（包含子模块）");
           cmds.push("git clone --recursive " + url);
           cmds.push("");
-          cmds.push("# 克隆特定分支");
+          cmds.push("# 下载为 ZIP 压缩包");
+          cmds.push("curl -L '" + url + "/archive/refs/heads/main.zip' -o repo.zip");
+          cmds.push("");
+          cmds.push("# 下载特定分支");
           cmds.push("git clone -b <branch_name> " + url);
         }
       } else if (platform.id === "npm") {
@@ -1048,21 +1043,23 @@ docker info | grep -A 5 "Registry Mirrors"</pre>
           cmds.push("# 下载包文件");
           cmds.push("curl -L '" + url + "' -o " + url.split('/').pop());
         } else {
-          const baseUrl = "https://" + host + "/npm";
+          cmds.push("# npm 安装包");
+          cmds.push("npm install <package_name>");
+          cmds.push("");
+          cmds.push("# 设置 npm 镜像源（临时）");
+          cmds.push("npm install <package_name> --registry=" + url);
+          cmds.push("");
           cmds.push("# 设置 npm 镜像源（全局）");
-          cmds.push("npm config set registry " + baseUrl);
-          cmds.push("");
-          cmds.push("# 设置 yarn 镜像源");
-          cmds.push("yarn config set registry " + baseUrl);
-          cmds.push("");
-          cmds.push("# 设置 pnpm 镜像源");
-          cmds.push("pnpm config set registry " + baseUrl);
-          cmds.push("");
-          cmds.push("# 临时使用镜像源安装");
-          cmds.push("npm install <package_name> --registry=" + baseUrl);
+          cmds.push("npm config set registry " + url);
           cmds.push("");
           cmds.push("# 查看当前镜像源");
           cmds.push("npm config get registry");
+          cmds.push("");
+          cmds.push("# 使用 yarn");
+          cmds.push("yarn add <package_name>");
+          cmds.push("");
+          cmds.push("# 使用 pnpm");
+          cmds.push("pnpm add <package_name>");
         }
       } else if (platform.id === "pypi") {
         // 判断是否为具体的包文件链接
@@ -1080,118 +1077,97 @@ docker info | grep -A 5 "Registry Mirrors"</pre>
           cmds.push("# 使用 wget 下载");
           cmds.push("wget '" + url + "'");
         } else {
-          // PyPI 镜像源配置
-          const baseUrl = "https://" + host + "/pypi";
-          cmds.push("# 设置 pip 全局镜像源");
-          cmds.push("pip config set global.index-url " + baseUrl + "/simple");
-          cmds.push("pip config set global.trusted-host " + host);
+          cmds.push("# pip 安装包");
+          cmds.push("pip install <package_name> -i " + url + "/simple");
           cmds.push("");
-          cmds.push("# 临时使用镜像源安装");
-          cmds.push("pip install <package_name> -i " + baseUrl + "/simple --trusted-host " + host);
+          cmds.push("# pip 安装包（信任主机）");
+          cmds.push("pip install <package_name> -i " + url + "/simple --trusted-host " + new URL(url).host);
+          cmds.push("");
+          cmds.push("# 设置全局镜像源");
+          cmds.push("pip config set global.index-url " + url + "/simple");
           cmds.push("");
           cmds.push("# 安装 requirements.txt");
-          cmds.push("pip install -r requirements.txt -i " + baseUrl + "/simple");
+          cmds.push("pip install -r requirements.txt -i " + url + "/simple");
           cmds.push("");
-          cmds.push("# 查看当前镜像源");
-          cmds.push("pip config get global.index-url");
+          cmds.push("# 使用 pip3");
+          cmds.push("pip3 install <package_name> -i " + url + "/simple");
         }
       } else if (platform.id === "hf") {
-        // 判断是否为文件链接
-        const isFileLink = /\\.(bin|safetensors|gguf|pt|pth|onnx|h5|pkl|json|txt|md)$/i.test(url) || url.includes('/resolve/');
-        const baseUrl = "https://" + host + "/hf";
-        if (isFileLink) {
-          cmds.push("# 下载模型文件");
-          cmds.push("curl -L '" + url + "' -o " + (url.split('/').pop() || 'model.bin'));
-          cmds.push("");
-          cmds.push("# 使用 wget 下载");
-          cmds.push("wget '" + url + "'");
-          cmds.push("");
-          cmds.push("# 使用 aria2 多线程下载");
-          cmds.push("aria2c -x 16 '" + url + "'");
-        } else {
-          cmds.push("# 设置 HF 镜像端点");
-          cmds.push("export HF_ENDPOINT=" + baseUrl);
-          cmds.push("");
-          cmds.push("# 使用 huggingface-cli 下载");
-          cmds.push("HF_ENDPOINT=" + baseUrl + " huggingface-cli download <repo_id> --local-dir ./models");
-          cmds.push("");
-          cmds.push("# Git LFS 克隆模型仓库");
-          cmds.push("git lfs install && git clone " + url);
-        }
-      } else if (platform.id === "golang") {
-        const baseUrl = "https://" + host + "/golang";
-        cmds.push("# 设置 GOPROXY 镜像");
-        cmds.push("go env -w GOPROXY=" + baseUrl + ",direct");
-        cmds.push("");
-        cmds.push("# 验证配置");
-        cmds.push("go env GOPROXY");
-        cmds.push("");
-        cmds.push("# 获取模块");
-        cmds.push("go get <module_path>");
-        cmds.push("");
-        cmds.push("# 下载依赖");
-        cmds.push("go mod download");
-        cmds.push("");
-        cmds.push("# 清理模块缓存");
-        cmds.push("go clean -modcache");
-      } else if (platform.id === "maven") {
-        cmds.push("# settings.xml 镜像配置（~/.m2/settings.xml）");
-        cmds.push("<mirrors>");
-        cmds.push("  <mirror>");
-        cmds.push("    <id>hxorz</id>");
-        cmds.push("    <mirrorOf>central</mirrorOf>");
-        cmds.push("    <url>" + url + "</url>");
-        cmds.push("  </mirror>");
-        cmds.push("</mirrors>");
-        cmds.push("");
-        cmds.push("# 下载依赖");
-        cmds.push("mvn dependency:resolve");
-        cmds.push("");
-        cmds.push("# 构建项目");
-        cmds.push("mvn clean install");
-      } else if (platform.id === "conda") {
-        const baseUrl = "https://" + host + "/conda";
-        cmds.push("# 添加 Conda 镜像源");
-        cmds.push("conda config --add channels " + baseUrl + "/main");
-        cmds.push("conda config --add channels " + baseUrl + "/conda-forge");
-        cmds.push("conda config --set show_channel_urls yes");
-        cmds.push("");
-        cmds.push("# 查看当前源");
-        cmds.push("conda config --show channels");
-        cmds.push("");
-        cmds.push("# 安装包");
-        cmds.push("conda install <package_name>");
-        cmds.push("");
-        cmds.push("# 创建新环境");
-        cmds.push("conda create -n myenv python=3.10");
-      } else if (platform.id === "crates") {
-        cmds.push("# 配置 Cargo 镜像源（~/.cargo/config.toml）");
-        cmds.push("[source.crates-io]");
-        cmds.push("replace-with = 'mirror'");
-        cmds.push("");
-        cmds.push("[source.mirror]");
-        cmds.push("registry = 'sparse+" + url + "/index/'");
-        cmds.push("");
-        cmds.push("# 安装 crate");
-        cmds.push("cargo install <crate_name>");
-        cmds.push("");
-        cmds.push("# 构建项目");
-        cmds.push("cargo build --release");
-      } else {
         cmds.push("# 下载文件");
-        cmds.push("curl -L '" + url + "' -o " + (url.split('/').pop() || 'download'));
+        cmds.push("curl -L '" + url + "' -o model.bin");
         cmds.push("");
         cmds.push("# 使用 wget 下载");
         cmds.push("wget '" + url + "'");
         cmds.push("");
-        cmds.push("# 使用 aria2 多线程下载");
-        cmds.push("aria2c -x 16 '" + url + "'");
+        cmds.push("# 使用 huggingface-cli 下载（需安装 huggingface_hub）");
+        cmds.push("huggingface-cli download <repo_id> --local-dir ./models");
+        cmds.push("");
+        cmds.push("# Git LFS 克隆模型仓库");
+        cmds.push("git lfs install && git clone " + url);
+        cmds.push("");
+        cmds.push("# 设置 HF 镜像端点");
+        cmds.push("export HF_ENDPOINT=" + url.replace(/\\/[^/]*$/, ''));
+      } else if (platform.id === "golang") {
+        cmds.push("# Go 获取模块");
+        cmds.push("go get <module_path>");
+        cmds.push("");
+        cmds.push("# 设置 GOPROXY");
+        cmds.push("go env -w GOPROXY=" + url + ",direct");
+        cmds.push("");
+        cmds.push("# 查看当前 GOPROXY");
+        cmds.push("go env GOPROXY");
+        cmds.push("");
+        cmds.push("# 清理模块缓存");
+        cmds.push("go clean -modcache");
+      } else if (platform.id === "maven") {
+        cmds.push("# Maven 构建（需配置 settings.xml）");
+        cmds.push("mvn clean install");
+        cmds.push("");
+        cmds.push("# 下载依赖");
+        cmds.push("mvn dependency:resolve");
+        cmds.push("");
+        cmds.push("# settings.xml 镜像配置示例");
+        cmds.push("# <mirror>");
+        cmds.push("#   <id>hxorz</id>");
+        cmds.push("#   <mirrorOf>central</mirrorOf>");
+        cmds.push("#   <url>" + url + "</url>");
+        cmds.push("# </mirror>");
+      } else if (platform.id === "conda") {
+        cmds.push("# Conda 安装包");
+        cmds.push("conda install <package_name>");
+        cmds.push("");
+        cmds.push("# 添加镜像源");
+        cmds.push("conda config --add channels " + url);
+        cmds.push("");
+        cmds.push("# 查看当前源");
+        cmds.push("conda config --show channels");
+        cmds.push("");
+        cmds.push("# 创建新环境");
+        cmds.push("conda create -n myenv python=3.10");
+      } else if (platform.id === "crates") {
+        cmds.push("# Cargo 安装");
+        cmds.push("cargo install <crate_name>");
+        cmds.push("");
+        cmds.push("# 配置镜像源（编辑 ~/.cargo/config）");
+        cmds.push("[source.crates-io]");
+        cmds.push("replace-with = 'mirror'");
+        cmds.push("[source.mirror]");
+        cmds.push("registry = '" + url + "'");
+      } else {
+        cmds.push("# 下载文件");
+        cmds.push("curl -L '" + url + "' -o filename");
+        cmds.push("");
+        cmds.push("# 使用 wget 下载");
+        cmds.push("wget '" + url + "'");
+        cmds.push("");
+        cmds.push("# 下载并解压");
+        cmds.push("curl -L '" + url + "' | tar -xz");
         cmds.push("");
         cmds.push("# 断点续传");
         cmds.push("wget -c '" + url + "'");
         cmds.push("");
-        cmds.push("# 下载并解压");
-        cmds.push("curl -L '" + url + "' | tar -xz");
+        cmds.push("# 使用 aria2 多线程下载");
+        cmds.push("aria2c -x 16 '" + url + "'");
       }
       return cmds.join("\\n");
     }
@@ -1402,13 +1378,7 @@ docker info | grep -A 5 "Registry Mirrors"</pre>
     let typingSpeed = 50;
 
     function typeWriter() {
-      if (!securityKnowledge || !securityKnowledge.length || !typewriterText) return;
-
       const currentText = securityKnowledge[currentIndex];
-      if (!currentText) {
-        currentIndex = 0;
-        return setTimeout(typeWriter, 100);
-      }
 
       if (isDeleting) {
         typewriterText.textContent = currentText.substring(0, charIndex - 1);
@@ -1433,13 +1403,7 @@ docker info | grep -A 5 "Registry Mirrors"</pre>
     }
 
     // 启动打字机效果
-    try {
-      if (typewriterText && securityKnowledge && securityKnowledge.length > 0) {
-        typeWriter();
-      }
-    } catch (e) {
-      console.error('TypeWriter init error:', e);
-    }
+    typeWriter();
 
     // === Docker 发行版切换 ===
     const distroTabs = document.querySelectorAll('.distro-tab');
@@ -1512,16 +1476,8 @@ docker info | grep -A 5 "Registry Mirrors"</pre>
     }
 
     // 初始化
-    try {
-      convert();
-    } catch (e) {
-      console.error('Convert error:', e);
-    }
-    try {
-      initVisitorInfo();
-    } catch (e) {
-      console.error('InitVisitorInfo error:', e);
-    }
+    convert();
+    initVisitorInfo();
 
     // === busuanzi ===
     (function initBusuanzi() {
