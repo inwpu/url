@@ -1365,9 +1365,7 @@ docker info | grep -A 5 "Registry Mirrors"</pre>
   "信息流安全验证（Information Flow Tracking）能够分析密钥、随机数、访问控制信号等敏感数据是否在逻辑电路中以非预期方式传播；如果密钥位以组合电路泄露到未授权端口，将被视为严重安全缺陷，必须在 RTL 级别修复。",
   
   "硬件安全不仅关注算法，也关注物理实现，例如 AES 的查表实现（T-table）容易暴露密钥相关的缓存访问模式，而基于位切片（bit-slicing）或常数时间 S盒的实现方式则显著降低缓存式侧信道风险，是现代密码实现的最佳实践。",
-  
-  // ===== 机器学习 / 深度学习 / 强化学习 结合安全与芯片验证 =====
-  
+
   "在网络空间安全领域，机器学习最常见的应用之一是入侵检测与流量分类，利用监督学习模型从海量网络流量中自动学习恶意模式，但如果训练数据分布与真实环境差异过大，模型容易出现高误报或被对抗样本绕过，因此需要持续更新与在线学习机制。",
   
   "深度学习在侧信道分析中被证明具有强大能力，攻击者可以将芯片功耗或电磁波形视为时间序列或二维“图像”，训练卷积神经网络（CNN）或循环神经网络（RNN）直接从原始轨迹中恢复密钥，大幅减少对手工特征工程的依赖，也迫使防御方重新审视随机掩码的有效性。",
@@ -1404,7 +1402,13 @@ docker info | grep -A 5 "Registry Mirrors"</pre>
     let typingSpeed = 50;
 
     function typeWriter() {
+      if (!securityKnowledge || !securityKnowledge.length || !typewriterText) return;
+
       const currentText = securityKnowledge[currentIndex];
+      if (!currentText) {
+        currentIndex = 0;
+        return setTimeout(typeWriter, 100);
+      }
 
       if (isDeleting) {
         typewriterText.textContent = currentText.substring(0, charIndex - 1);
@@ -1429,7 +1433,13 @@ docker info | grep -A 5 "Registry Mirrors"</pre>
     }
 
     // 启动打字机效果
-    typeWriter();
+    try {
+      if (typewriterText && securityKnowledge && securityKnowledge.length > 0) {
+        typeWriter();
+      }
+    } catch (e) {
+      console.error('TypeWriter init error:', e);
+    }
 
     // === Docker 发行版切换 ===
     const distroTabs = document.querySelectorAll('.distro-tab');
@@ -1502,8 +1512,16 @@ docker info | grep -A 5 "Registry Mirrors"</pre>
     }
 
     // 初始化
-    convert();
-    initVisitorInfo();
+    try {
+      convert();
+    } catch (e) {
+      console.error('Convert error:', e);
+    }
+    try {
+      initVisitorInfo();
+    } catch (e) {
+      console.error('InitVisitorInfo error:', e);
+    }
 
     // === busuanzi ===
     (function initBusuanzi() {
