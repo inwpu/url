@@ -986,7 +986,12 @@ docker info | grep -A 5 "Registry Mirrors"</pre>
     function buildCommands(platform, url) {
       if (!platform || !url) return "";
       const cmds = [];
-      const host = new URL(url).host;
+      let host = "";
+      try {
+        host = new URL(url).host;
+      } catch (e) {
+        return "";
+      }
 
       if (platform.id === "docker") {
         const noScheme = url.replace(/^https?:\\/\\//i, "");
