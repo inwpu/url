@@ -86,8 +86,8 @@ const HTML = `<!DOCTYPE html>
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: 60vh;
-      padding: 40px 20px;
+      min-height: 180px;
+      padding: 20px 20px 30px;
     }
 
     .typewriter-container {
@@ -95,23 +95,28 @@ const HTML = `<!DOCTYPE html>
       text-align: center;
     }
 
+    .typewriter-wrapper {
+      display: inline-block;
+      text-align: left;
+    }
+
     .typewriter-text {
-      font-size: 24px;
+      font-size: 18px;
       color: #22c55e;
-      line-height: 1.8;
+      line-height: 1.6;
       font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
       text-shadow: 0 0 20px rgba(34, 197, 94, 0.5);
-      min-height: 120px;
     }
 
     .typewriter-cursor {
       display: inline-block;
       width: 3px;
-      height: 1.2em;
+      height: 1.1em;
       background: #22c55e;
       margin-left: 2px;
       vertical-align: text-bottom;
       animation: blink 1s infinite;
+      box-shadow: 0 0 10px rgba(34, 197, 94, 0.8);
     }
 
     @keyframes blink {
@@ -120,19 +125,19 @@ const HTML = `<!DOCTYPE html>
     }
 
     .typewriter-title {
-      font-size: 14px;
+      font-size: 12px;
       color: #9ca3af;
-      margin-bottom: 20px;
+      margin-bottom: 12px;
       letter-spacing: 0.1em;
       text-transform: uppercase;
     }
 
     @media (max-width: 640px) {
       .typewriter-text {
-        font-size: 16px;
+        font-size: 14px;
       }
       .typewriter-section {
-        min-height: 50vh;
+        min-height: 140px;
       }
     }
 
@@ -142,10 +147,26 @@ const HTML = `<!DOCTYPE html>
       background: rgba(15, 23, 42, 0.96);
       border-radius: 20px;
       padding: 20px 20px 18px;
-      box-shadow: 0 20px 40px rgba(15, 23, 42, 0.9);
-      border: 1px solid rgba(148, 163, 184, 0.35);
+      box-shadow: 0 20px 40px rgba(15, 23, 42, 0.9), 0 0 30px rgba(34, 197, 94, 0.1);
+      border: 1px solid rgba(56, 189, 248, 0.3);
       backdrop-filter: blur(14px);
       margin-bottom: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #22c55e, #06b6d4, transparent);
+      animation: cardGlow 3s ease-in-out infinite;
+    }
+    @keyframes cardGlow {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
     }
 
     .field {
@@ -166,22 +187,54 @@ const HTML = `<!DOCTYPE html>
     input, textarea {
       width: 100%;
       border-radius: 10px;
-      border: 1px solid rgba(148, 163, 184, 0.6);
+      border: 1px solid rgba(56, 189, 248, 0.5);
       background: rgba(15, 23, 42, 0.9);
       color: #e5e7eb;
       padding: 9px 11px;
       font-size: 13px;
       outline: none;
-      transition: border-color 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.2), inset 0 0 10px rgba(56, 189, 248, 0.05);
+      position: relative;
     }
     input:focus, textarea:focus {
       border-color: #38bdf8;
-      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.4);
+      box-shadow: 0 0 25px rgba(56, 189, 248, 0.4), 0 0 50px rgba(34, 197, 94, 0.2), inset 0 0 15px rgba(56, 189, 248, 0.1);
       background: rgba(15, 23, 42, 0.95);
     }
     textarea {
       min-height: 64px;
       resize: vertical;
+    }
+
+    /* 输入框发光流动动画 */
+    .glow-input-wrapper {
+      position: relative;
+      overflow: hidden;
+      border-radius: 10px;
+    }
+    .glow-input-wrapper::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.6), rgba(34, 197, 94, 0.6), transparent);
+      background-size: 200% 100%;
+      animation: glowFlow 3s linear infinite;
+      border-radius: 12px;
+      z-index: -1;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .glow-input-wrapper:focus-within::before {
+      opacity: 1;
+    }
+
+    @keyframes glowFlow {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
     }
 
     .output-row {
@@ -207,15 +260,32 @@ const HTML = `<!DOCTYPE html>
       background: linear-gradient(135deg, #22c55e, #06b6d4);
       color: #f9fafb;
       font-weight: 600;
-      transition: transform 0.1s ease, box-shadow 0.1s ease, filter 0.1s ease;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 0 20px rgba(34, 197, 94, 0.4), 0 0 40px rgba(6, 182, 212, 0.2);
+    }
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+      animation: btnShine 2s infinite;
+    }
+    @keyframes btnShine {
+      0% { left: -100%; }
+      50%, 100% { left: 100%; }
     }
     .btn:hover {
-      filter: brightness(1.05);
-      box-shadow: 0 10px 18px rgba(34, 197, 94, 0.35);
-      transform: translateY(-1px);
+      filter: brightness(1.1);
+      box-shadow: 0 0 30px rgba(34, 197, 94, 0.6), 0 0 60px rgba(6, 182, 212, 0.4), 0 10px 25px rgba(34, 197, 94, 0.5);
+      transform: translateY(-2px);
     }
     .btn:active {
-      box-shadow: 0 4px 10px rgba(34, 197, 94, 0.3);
+      box-shadow: 0 0 15px rgba(34, 197, 94, 0.5), 0 5px 15px rgba(34, 197, 94, 0.4);
       transform: translateY(0);
     }
 
@@ -267,10 +337,22 @@ const HTML = `<!DOCTYPE html>
       background: rgba(15, 23, 42, 0.96);
       border-radius: 20px;
       padding: 20px;
-      box-shadow: 0 20px 40px rgba(15, 23, 42, 0.9);
-      border: 1px solid rgba(148, 163, 184, 0.35);
+      box-shadow: 0 20px 40px rgba(15, 23, 42, 0.9), 0 0 30px rgba(6, 182, 212, 0.1);
+      border: 1px solid rgba(56, 189, 248, 0.3);
       backdrop-filter: blur(14px);
       margin-bottom: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .docker-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #06b6d4, #22c55e, transparent);
+      animation: cardGlow 3s ease-in-out infinite reverse;
     }
 
     .docker-card h3 {
@@ -343,23 +425,27 @@ const HTML = `<!DOCTYPE html>
     .distro-tab {
       padding: 6px 12px;
       border-radius: 8px;
-      border: 1px solid rgba(148, 163, 184, 0.5);
+      border: 1px solid rgba(56, 189, 248, 0.4);
       background: rgba(15, 23, 42, 0.9);
       color: #9ca3af;
       font-size: 11px;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.1);
     }
 
     .distro-tab:hover {
       border-color: #38bdf8;
       color: #e5e7eb;
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
+      transform: translateY(-1px);
     }
 
     .distro-tab.active {
       background: linear-gradient(135deg, #22c55e, #06b6d4);
       color: #fff;
       border-color: transparent;
+      box-shadow: 0 0 20px rgba(34, 197, 94, 0.4);
     }
 
     .distro-content {
@@ -480,8 +566,9 @@ const HTML = `<!DOCTYPE html>
       <section class="typewriter-section">
         <div class="typewriter-container">
           <div class="typewriter-title">Cybersecurity Knowledge</div>
-          <div class="typewriter-text" id="typewriterText"></div>
-          <span class="typewriter-cursor"></span>
+          <div class="typewriter-wrapper">
+            <span class="typewriter-text" id="typewriterText"></span><span class="typewriter-cursor" id="typewriterCursor"></span>
+          </div>
         </div>
       </section>
 
@@ -678,16 +765,30 @@ docker info | grep -A 5 "Registry Mirrors"</pre>
   <button class="info-toggle" id="infoToggle">访问信息</button>
 
   <script>
-    // === 粒子动画背景 ===
+    // === 粒子动画背景（支持鼠标交互） ===
     const canvas = document.getElementById('particles-canvas');
     const ctx = canvas.getContext('2d');
     let particles = [];
     let animationId;
+    let mouse = { x: null, y: null, radius: 150 };
+
+    canvas.style.pointerEvents = 'auto';
 
     function resizeCanvas() {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
     }
+
+    // 鼠标事件监听
+    window.addEventListener('mousemove', (e) => {
+      mouse.x = e.x;
+      mouse.y = e.y;
+    });
+
+    window.addEventListener('mouseout', () => {
+      mouse.x = null;
+      mouse.y = null;
+    });
 
     class Particle {
       constructor() {
@@ -697,19 +798,62 @@ docker info | grep -A 5 "Registry Mirrors"</pre>
       reset() {
         this.x = Math.random() * canvas.width;
         this.y = Math.random() * canvas.height;
-        this.size = Math.random() * 2 + 0.5;
-        this.speedX = (Math.random() - 0.5) * 0.5;
-        this.speedY = (Math.random() - 0.5) * 0.5;
-        this.opacity = Math.random() * 0.5 + 0.2;
+        this.baseX = this.x;
+        this.baseY = this.y;
+        this.size = Math.random() * 2.5 + 0.8;
+        this.speedX = (Math.random() - 0.5) * 0.8;
+        this.speedY = (Math.random() - 0.5) * 0.8;
+        this.opacity = Math.random() * 0.6 + 0.3;
         this.hue = Math.random() * 60 + 120; // 绿色到青色
+        this.density = (Math.random() * 30) + 1;
       }
 
       update() {
-        this.x += this.speedX;
-        this.y += this.speedY;
+        // 鼠标交互
+        if (mouse.x != null && mouse.y != null) {
+          let dx = mouse.x - this.x;
+          let dy = mouse.y - this.y;
+          let distance = Math.sqrt(dx * dx + dy * dy);
+          let forceDirectionX = dx / distance;
+          let forceDirectionY = dy / distance;
+          let maxDistance = mouse.radius;
+          let force = (maxDistance - distance) / maxDistance;
+          let directionX = forceDirectionX * force * this.density;
+          let directionY = forceDirectionY * force * this.density;
 
-        if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
-        if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+          if (distance < mouse.radius) {
+            this.x -= directionX;
+            this.y -= directionY;
+          } else {
+            if (this.x !== this.baseX) {
+              let dx = this.x - this.baseX;
+              this.x -= dx / 20;
+            }
+            if (this.y !== this.baseY) {
+              let dy = this.y - this.baseY;
+              this.y -= dy / 20;
+            }
+          }
+        }
+
+        // 基础移动
+        this.baseX += this.speedX;
+        this.baseY += this.speedY;
+
+        if (this.baseX < 0 || this.baseX > canvas.width) this.speedX *= -1;
+        if (this.baseY < 0 || this.baseY > canvas.height) this.speedY *= -1;
+
+        // 缓慢回归
+        if (mouse.x == null) {
+          if (this.x !== this.baseX) {
+            let dx = this.x - this.baseX;
+            this.x -= dx / 10;
+          }
+          if (this.y !== this.baseY) {
+            let dy = this.y - this.baseY;
+            this.y -= dy / 10;
+          }
+        }
       }
 
       draw() {
@@ -717,12 +861,16 @@ docker info | grep -A 5 "Registry Mirrors"</pre>
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
         ctx.fillStyle = \`hsla(\${this.hue}, 70%, 60%, \${this.opacity})\`;
         ctx.fill();
+
+        // 添加发光效果
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = \`hsla(\${this.hue}, 70%, 60%, 0.5)\`;
       }
     }
 
     function initParticles() {
       particles = [];
-      const count = Math.min(150, Math.floor((canvas.width * canvas.height) / 10000));
+      const count = Math.min(180, Math.floor((canvas.width * canvas.height) / 8000));
       for (let i = 0; i < count; i++) {
         particles.push(new Particle());
       }
@@ -735,13 +883,30 @@ docker info | grep -A 5 "Registry Mirrors"</pre>
           const dy = particles[i].y - particles[j].y;
           const dist = Math.sqrt(dx * dx + dy * dy);
 
-          if (dist < 100) {
-            const opacity = (1 - dist / 100) * 0.15;
+          if (dist < 120) {
+            const opacity = (1 - dist / 120) * 0.2;
             ctx.beginPath();
             ctx.strokeStyle = \`rgba(34, 197, 94, \${opacity})\`;
-            ctx.lineWidth = 0.5;
+            ctx.lineWidth = 0.8;
             ctx.moveTo(particles[i].x, particles[i].y);
             ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.stroke();
+          }
+        }
+
+        // 鼠标与粒子连线
+        if (mouse.x != null && mouse.y != null) {
+          const dx = particles[i].x - mouse.x;
+          const dy = particles[i].y - mouse.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist < mouse.radius) {
+            const opacity = (1 - dist / mouse.radius) * 0.5;
+            ctx.beginPath();
+            ctx.strokeStyle = \`rgba(56, 189, 248, \${opacity})\`;
+            ctx.lineWidth = 1;
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(mouse.x, mouse.y);
             ctx.stroke();
           }
         }
@@ -845,15 +1010,144 @@ docker info | grep -A 5 "Registry Mirrors"</pre>
       const cmds = [];
       if (platform.id === "docker") {
         const noScheme = url.replace(/^https?:\\/\\//i, "");
-        cmds.push("# Docker 拉取镜像（如有私有仓库登录等，请自行补充）");
+        cmds.push("# Docker 拉取镜像");
         cmds.push("docker pull " + noScheme);
+        cmds.push("");
+        cmds.push("# 查看镜像信息");
+        cmds.push("docker images " + noScheme.split('/').pop().split(':')[0]);
+        cmds.push("");
+        cmds.push("# 运行容器（交互式）");
+        cmds.push("docker run -it --rm " + noScheme);
+        cmds.push("");
+        cmds.push("# 运行容器（后台模式）");
+        cmds.push("docker run -d --name mycontainer " + noScheme);
+        cmds.push("");
+        cmds.push("# 使用 docker-compose（需自行创建 docker-compose.yml）");
+        cmds.push("docker-compose pull && docker-compose up -d");
       } else if (["github","gist","gitlab","gitea","codeberg","sf","aosp","homebrew"].includes(platform.id)) {
         cmds.push("# Git 克隆仓库");
         cmds.push("git clone " + url);
+        cmds.push("");
+        cmds.push("# Git 克隆仓库（浅克隆，速度更快）");
+        cmds.push("git clone --depth 1 " + url);
+        cmds.push("");
+        cmds.push("# Git 克隆仓库（包含子模块）");
+        cmds.push("git clone --recursive " + url);
+        cmds.push("");
+        cmds.push("# 下载为 ZIP 压缩包");
+        cmds.push("curl -L '" + url + "/archive/refs/heads/main.zip' -o repo.zip");
+        cmds.push("");
+        cmds.push("# 下载特定分支");
+        cmds.push("git clone -b <branch_name> " + url);
+      } else if (platform.id === "npm") {
+        cmds.push("# npm 安装包");
+        cmds.push("npm install <package_name>");
+        cmds.push("");
+        cmds.push("# 设置 npm 镜像源（临时）");
+        cmds.push("npm install <package_name> --registry=" + url);
+        cmds.push("");
+        cmds.push("# 设置 npm 镜像源（全局）");
+        cmds.push("npm config set registry " + url);
+        cmds.push("");
+        cmds.push("# 查看当前镜像源");
+        cmds.push("npm config get registry");
+        cmds.push("");
+        cmds.push("# 使用 yarn");
+        cmds.push("yarn add <package_name>");
+        cmds.push("");
+        cmds.push("# 使用 pnpm");
+        cmds.push("pnpm add <package_name>");
+      } else if (platform.id === "pypi") {
+        cmds.push("# pip 安装包");
+        cmds.push("pip install <package_name> -i " + url + "/simple");
+        cmds.push("");
+        cmds.push("# pip 安装包（信任主机）");
+        cmds.push("pip install <package_name> -i " + url + "/simple --trusted-host " + new URL(url).host);
+        cmds.push("");
+        cmds.push("# 设置全局镜像源");
+        cmds.push("pip config set global.index-url " + url + "/simple");
+        cmds.push("");
+        cmds.push("# 安装 requirements.txt");
+        cmds.push("pip install -r requirements.txt -i " + url + "/simple");
+        cmds.push("");
+        cmds.push("# 使用 pip3");
+        cmds.push("pip3 install <package_name> -i " + url + "/simple");
+      } else if (platform.id === "hf") {
+        cmds.push("# 下载文件");
+        cmds.push("curl -L '" + url + "' -o model.bin");
+        cmds.push("");
+        cmds.push("# 使用 wget 下载");
+        cmds.push("wget '" + url + "'");
+        cmds.push("");
+        cmds.push("# 使用 huggingface-cli 下载（需安装 huggingface_hub）");
+        cmds.push("huggingface-cli download <repo_id> --local-dir ./models");
+        cmds.push("");
+        cmds.push("# Git LFS 克隆模型仓库");
+        cmds.push("git lfs install && git clone " + url);
+        cmds.push("");
+        cmds.push("# 设置 HF 镜像端点");
+        cmds.push("export HF_ENDPOINT=" + url.replace(/\\/[^/]*$/, ''));
+      } else if (platform.id === "golang") {
+        cmds.push("# Go 获取模块");
+        cmds.push("go get <module_path>");
+        cmds.push("");
+        cmds.push("# 设置 GOPROXY");
+        cmds.push("go env -w GOPROXY=" + url + ",direct");
+        cmds.push("");
+        cmds.push("# 查看当前 GOPROXY");
+        cmds.push("go env GOPROXY");
+        cmds.push("");
+        cmds.push("# 清理模块缓存");
+        cmds.push("go clean -modcache");
+      } else if (platform.id === "maven") {
+        cmds.push("# Maven 构建（需配置 settings.xml）");
+        cmds.push("mvn clean install");
+        cmds.push("");
+        cmds.push("# 下载依赖");
+        cmds.push("mvn dependency:resolve");
+        cmds.push("");
+        cmds.push("# settings.xml 镜像配置示例");
+        cmds.push("# <mirror>");
+        cmds.push("#   <id>hxorz</id>");
+        cmds.push("#   <mirrorOf>central</mirrorOf>");
+        cmds.push("#   <url>" + url + "</url>");
+        cmds.push("# </mirror>");
+      } else if (platform.id === "conda") {
+        cmds.push("# Conda 安装包");
+        cmds.push("conda install <package_name>");
+        cmds.push("");
+        cmds.push("# 添加镜像源");
+        cmds.push("conda config --add channels " + url);
+        cmds.push("");
+        cmds.push("# 查看当前源");
+        cmds.push("conda config --show channels");
+        cmds.push("");
+        cmds.push("# 创建新环境");
+        cmds.push("conda create -n myenv python=3.10");
+      } else if (platform.id === "crates") {
+        cmds.push("# Cargo 安装");
+        cmds.push("cargo install <crate_name>");
+        cmds.push("");
+        cmds.push("# 配置镜像源（编辑 ~/.cargo/config）");
+        cmds.push("[source.crates-io]");
+        cmds.push("replace-with = 'mirror'");
+        cmds.push("[source.mirror]");
+        cmds.push("registry = '" + url + "'");
       } else {
         cmds.push("# 下载文件");
-        cmds.push("curl -L '" + url + "'");
+        cmds.push("curl -L '" + url + "' -o filename");
+        cmds.push("");
+        cmds.push("# 使用 wget 下载");
         cmds.push("wget '" + url + "'");
+        cmds.push("");
+        cmds.push("# 下载并解压");
+        cmds.push("curl -L '" + url + "' | tar -xz");
+        cmds.push("");
+        cmds.push("# 断点续传");
+        cmds.push("wget -c '" + url + "'");
+        cmds.push("");
+        cmds.push("# 使用 aria2 多线程下载");
+        cmds.push("aria2c -x 16 '" + url + "'");
       }
       return cmds.join("\\n");
     }
