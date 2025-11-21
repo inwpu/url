@@ -140,7 +140,7 @@ const HTML = `<!DOCTYPE html>
       border-radius: 20px;
       padding: 20px 20px 18px;
       box-shadow: 0 20px 40px rgba(15, 23, 42, 0.9), 0 0 30px rgba(34, 197, 94, 0.1);
-      border: 1px solid rgba(56, 189, 248, 0.3);
+      border: 1px solid transparent;
       backdrop-filter: blur(14px);
       margin-bottom: 20px;
       position: relative;
@@ -149,16 +149,31 @@ const HTML = `<!DOCTYPE html>
     .card::before {
       content: '';
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, #22c55e, #06b6d4, transparent);
-      animation: cardGlow 3s ease-in-out infinite;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000);
+      background-size: 400%;
+      border-radius: 22px;
+      z-index: -1;
+      animation: borderRotate 8s linear infinite;
     }
-    @keyframes cardGlow {
-      0%, 100% { opacity: 0.5; }
-      50% { opacity: 1; }
+    .card::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      right: 2px;
+      bottom: 2px;
+      background: rgba(15, 23, 42, 0.96);
+      border-radius: 18px;
+      z-index: -1;
+    }
+    @keyframes borderRotate {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
 
     .field {
@@ -317,7 +332,7 @@ const HTML = `<!DOCTYPE html>
       border-radius: 20px;
       padding: 20px;
       box-shadow: 0 20px 40px rgba(15, 23, 42, 0.9), 0 0 30px rgba(6, 182, 212, 0.1);
-      border: 1px solid rgba(56, 189, 248, 0.3);
+      border: 1px solid transparent;
       backdrop-filter: blur(14px);
       margin-bottom: 20px;
       position: relative;
@@ -326,12 +341,26 @@ const HTML = `<!DOCTYPE html>
     .docker-card::before {
       content: '';
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, #06b6d4, #22c55e, transparent);
-      animation: cardGlow 3s ease-in-out infinite reverse;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000);
+      background-size: 400%;
+      border-radius: 22px;
+      z-index: -1;
+      animation: borderRotate 8s linear infinite reverse;
+    }
+    .docker-card::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      right: 2px;
+      bottom: 2px;
+      background: rgba(15, 23, 42, 0.96);
+      border-radius: 18px;
+      z-index: -1;
     }
 
     .docker-card h3 {
@@ -1450,14 +1479,28 @@ docker info | grep -A 5 "Registry Mirrors"</pre>
       document.getElementById("statUA").textContent =
         navigator.userAgent || "Unknown";
 
-      fetch("https://api.ipify.org?format=json")
-        .then(r => r.json())
-        .then(data => {
-          document.getElementById("statIP").textContent = data.ip || "-";
-        })
-        .catch(() => {
-          document.getElementById("statIP").textContent = "获取失败";
-        });
+      // 尝试多个 IP 查询 API，优先使用国内可访问的
+      const ipApis = [
+        { url: "https://api.ip.sb/ip", parser: text => text.trim() },
+        { url: "https://api.ipify.org?format=json", parser: data => JSON.parse(data).ip }
+      ];
+
+      (async function getIP() {
+        for (const api of ipApis) {
+          try {
+            const response = await fetch(api.url);
+            const data = await response.text();
+            const ip = api.parser(data);
+            if (ip) {
+              document.getElementById("statIP").textContent = ip;
+              return;
+            }
+          } catch (e) {
+            continue;
+          }
+        }
+        document.getElementById("statIP").textContent = "获取失败";
+      })();
 
       setTimeout(() => {
         if (infoPanel) infoPanel.classList.add("hidden");
