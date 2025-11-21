@@ -81,100 +81,58 @@ const HTML = `<!DOCTYPE html>
       margin-right: auto;
     }
 
-    /* 罗盘时钟容器 */
-    .compass-clock-section {
+    /* 打字机效果区域 */
+    .typewriter-section {
       display: flex;
       justify-content: center;
       align-items: center;
-      margin-bottom: 30px;
-      padding: 20px;
+      min-height: 60vh;
+      padding: 40px 20px;
     }
 
-    .compass-clock {
-      position: relative;
-      width: min(90vw, 700px);
-      height: min(90vw, 700px);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .clock-ring {
-      position: absolute;
-      border-radius: 50%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .clock-item {
-      position: absolute;
-      font-size: 12px;
-      color: rgba(255, 255, 255, 0.4);
-      transform-origin: center;
-      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-      white-space: nowrap;
-    }
-
-    .clock-item.active {
-      color: #22c55e;
-      font-weight: 700;
-      text-shadow: 0 0 20px rgba(34, 197, 94, 0.8), 0 0 40px rgba(34, 197, 94, 0.4);
-      transform: scale(1.3);
-    }
-
-    .clock-item.rotating {
-      animation: itemRotate 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    @keyframes itemRotate {
-      0% { transform: scale(1) rotate(0deg); }
-      25% { transform: scale(1.5) rotate(90deg); }
-      50% { transform: scale(1.2) rotate(180deg); }
-      75% { transform: scale(1.4) rotate(270deg); }
-      100% { transform: scale(1.3) rotate(360deg); }
-    }
-
-    /* 中心信息显示 */
-    .clock-center {
-      position: absolute;
+    .typewriter-container {
+      max-width: 900px;
       text-align: center;
-      z-index: 10;
     }
 
-    .clock-center-text {
-      font-size: 16px;
-      color: #e5e7eb;
+    .typewriter-text {
+      font-size: 24px;
+      color: #22c55e;
       line-height: 1.8;
+      font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+      text-shadow: 0 0 20px rgba(34, 197, 94, 0.5);
+      min-height: 120px;
     }
 
-    .clock-center-text span {
+    .typewriter-cursor {
       display: inline-block;
-      margin: 0 8px;
-      padding: 4px 12px;
-      background: rgba(34, 197, 94, 0.2);
-      border-radius: 8px;
-      border: 1px solid rgba(34, 197, 94, 0.5);
+      width: 3px;
+      height: 1.2em;
+      background: #22c55e;
+      margin-left: 2px;
+      vertical-align: text-bottom;
+      animation: blink 1s infinite;
     }
 
-    /* 粒子爆炸效果 */
-    .burst-particle {
-      position: absolute;
-      width: 4px;
-      height: 4px;
-      border-radius: 50%;
-      pointer-events: none;
-      animation: burst 0.8s ease-out forwards;
+    @keyframes blink {
+      0%, 50% { opacity: 1; }
+      51%, 100% { opacity: 0; }
     }
 
-    @keyframes burst {
-      0% {
-        transform: translate(-50%, -50%) scale(1);
-        opacity: 1;
+    .typewriter-title {
+      font-size: 14px;
+      color: #9ca3af;
+      margin-bottom: 20px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    @media (max-width: 640px) {
+      .typewriter-text {
+        font-size: 16px;
       }
-      100% {
-        transform: translate(-50%, -50%) scale(0);
-        opacity: 0;
+      .typewriter-section {
+        min-height: 50vh;
       }
     }
 
@@ -518,12 +476,12 @@ const HTML = `<!DOCTYPE html>
         </div>
       </header>
 
-      <!-- 罗盘时钟 -->
-      <section class="compass-clock-section">
-        <div class="compass-clock" id="compassClock">
-          <div class="clock-center">
-            <div class="clock-center-text" id="clockCenterText"></div>
-          </div>
+      <!-- 打字机效果 -->
+      <section class="typewriter-section">
+        <div class="typewriter-container">
+          <div class="typewriter-title">Cybersecurity Knowledge</div>
+          <div class="typewriter-text" id="typewriterText"></div>
+          <span class="typewriter-cursor"></span>
         </div>
       </section>
 
@@ -1011,183 +969,64 @@ docker info | grep -A 5 "Registry Mirrors"</pre>
       }
     });
 
-    // === 罗盘时钟 ===
-    const compassClock = document.getElementById('compassClock');
-    const clockCenterText = document.getElementById('clockCenterText');
+    // === 打字机效果 ===
+    const typewriterText = document.getElementById('typewriterText');
 
-    // 中文数字
-    const chineseMonths = ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'];
-    const chineseDays = [];
-    for (let i = 1; i <= 31; i++) {
-      if (i <= 10) chineseDays.push(['一', '二', '三', '四', '五', '六', '七', '八', '九', '十'][i-1] + '号');
-      else if (i < 20) chineseDays.push('十' + ['一', '二', '三', '四', '五', '六', '七', '八', '九'][i-11] + '号');
-      else if (i === 20) chineseDays.push('二十号');
-      else if (i < 30) chineseDays.push('二十' + ['一', '二', '三', '四', '五', '六', '七', '八', '九'][i-21] + '号');
-      else if (i === 30) chineseDays.push('三十号');
-      else chineseDays.push('三十一号');
-    }
-    const chineseWeekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
-    const chineseHours = [];
-    for (let i = 0; i < 24; i++) {
-      if (i === 0) chineseHours.push('零点');
-      else if (i <= 10) chineseHours.push(['一', '二', '三', '四', '五', '六', '七', '八', '九', '十'][i-1] + '点');
-      else if (i < 20) chineseHours.push('十' + (i === 10 ? '' : ['一', '二', '三', '四', '五', '六', '七', '八', '九'][i-11]) + '点');
-      else if (i === 20) chineseHours.push('二十点');
-      else chineseHours.push('二十' + ['一', '二', '三'][i-21] + '点');
-    }
-    const chineseMinutes = [];
-    const chineseSeconds = [];
-    for (let i = 0; i < 60; i++) {
-      let str = '';
-      if (i === 0) str = '零';
-      else if (i <= 10) str = ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十'][i-1];
-      else if (i < 20) str = '十' + ['一', '二', '三', '四', '五', '六', '七', '八', '九'][i-11];
-      else if (i % 10 === 0) str = ['二十', '三十', '四十', '五十'][i/10-2];
-      else str = ['二十', '三十', '四十', '五十'][Math.floor(i/10)-2] + ['一', '二', '三', '四', '五', '六', '七', '八', '九'][i%10-1];
-      chineseMinutes.push(str + '分');
-      chineseSeconds.push(str + '秒');
-    }
-
-    // 环配置
-    const rings = [
-      { id: 'month', items: chineseMonths, radius: 0.95 },
-      { id: 'day', items: chineseDays, radius: 0.82 },
-      { id: 'weekday', items: chineseWeekdays, radius: 0.69 },
-      { id: 'hour', items: chineseHours, radius: 0.56 },
-      { id: 'minute', items: chineseMinutes, radius: 0.43 },
-      { id: 'second', items: chineseSeconds, radius: 0.30 }
+    const securityKnowledge = [
+      "AES (Advanced Encryption Standard) 是一种对称加密算法，密钥长度可为128、192或256位",
+      "RSA 算法基于大整数分解难题，是最广泛使用的公钥密码系统之一",
+      "SHA-256 是一种密码散列函数，输出256位哈希值，广泛用于数字签名和区块链",
+      "零知识证明允许一方向另一方证明某个陈述为真，而无需透露任何额外信息",
+      "侧信道攻击通过分析功耗、电磁辐射或时间信息来破解密码系统",
+      "可信执行环境 (TEE) 提供硬件隔离的安全区域，保护敏感数据和代码",
+      "物理不可克隆函数 (PUF) 利用芯片制造过程中的随机变化生成唯一密钥",
+      "差分功耗分析 (DPA) 是一种通过统计分析功耗轨迹来提取密钥的攻击方法",
+      "同态加密允许在加密数据上直接进行计算，而无需先解密",
+      "椭圆曲线密码学 (ECC) 以较短的密钥提供与RSA相当的安全性",
+      "安全多方计算 (MPC) 允许多方共同计算函数而不泄露各自的输入",
+      "格密码学被认为是抗量子计算攻击的后量子密码方案的基础",
+      "硬件安全模块 (HSM) 是用于管理和保护数字密钥的专用加密处理器",
+      "JTAG 调试接口可能被攻击者利用来提取固件或绕过安全机制",
+      "缓冲区溢出攻击通过向程序输入超出预期的数据来覆盖内存中的关键数据",
+      "Return-Oriented Programming (ROP) 利用现有代码片段构造恶意程序",
+      "ASLR (地址空间布局随机化) 通过随机化内存地址来防御内存攻击",
+      "Secure Boot 确保设备只能启动经过验证的固件和操作系统",
+      "Fault Injection 攻击通过电压毛刺或激光照射来诱发芯片错误",
+      "Post-Quantum Cryptography 研究能够抵抗量子计算机攻击的密码算法"
     ];
 
-    let clockElements = {};
-    let lastValues = {};
+    let currentIndex = 0;
+    let charIndex = 0;
+    let isDeleting = false;
+    let typingSpeed = 50;
 
-    function createCompassClock() {
-      const size = compassClock.offsetWidth;
-      const center = size / 2;
+    function typeWriter() {
+      const currentText = securityKnowledge[currentIndex];
 
-      rings.forEach(ring => {
-        clockElements[ring.id] = [];
-        const count = ring.items.length;
-        const radius = (size / 2) * ring.radius;
-
-        ring.items.forEach((item, i) => {
-          const angle = (i / count) * Math.PI * 2 - Math.PI / 2;
-          const x = center + Math.cos(angle) * radius;
-          const y = center + Math.sin(angle) * radius;
-
-          const el = document.createElement('div');
-          el.className = 'clock-item';
-          el.textContent = item;
-          el.style.left = x + 'px';
-          el.style.top = y + 'px';
-          el.style.transform = 'translate(-50%, -50%)';
-
-          compassClock.appendChild(el);
-          clockElements[ring.id].push(el);
-        });
-      });
-    }
-
-    function spawnBurstParticles(el) {
-      const rect = el.getBoundingClientRect();
-      const clockRect = compassClock.getBoundingClientRect();
-      const x = rect.left - clockRect.left + rect.width / 2;
-      const y = rect.top - clockRect.top + rect.height / 2;
-
-      for (let i = 0; i < 8; i++) {
-        const particle = document.createElement('div');
-        particle.className = 'burst-particle';
-        const angle = (i / 8) * Math.PI * 2;
-        const distance = 30 + Math.random() * 20;
-        const endX = x + Math.cos(angle) * distance;
-        const endY = y + Math.sin(angle) * distance;
-
-        particle.style.left = x + 'px';
-        particle.style.top = y + 'px';
-        particle.style.background = \`hsl(\${120 + Math.random() * 60}, 70%, 60%)\`;
-        particle.style.setProperty('--end-x', endX + 'px');
-        particle.style.setProperty('--end-y', endY + 'px');
-
-        compassClock.appendChild(particle);
-
-        // 动画到终点
-        particle.animate([
-          { left: x + 'px', top: y + 'px', opacity: 1, transform: 'scale(1)' },
-          { left: endX + 'px', top: endY + 'px', opacity: 0, transform: 'scale(0)' }
-        ], {
-          duration: 600,
-          easing: 'ease-out'
-        });
-
-        setTimeout(() => particle.remove(), 600);
+      if (isDeleting) {
+        typewriterText.textContent = currentText.substring(0, charIndex - 1);
+        charIndex--;
+        typingSpeed = 30;
+      } else {
+        typewriterText.textContent = currentText.substring(0, charIndex + 1);
+        charIndex++;
+        typingSpeed = 50;
       }
+
+      if (!isDeleting && charIndex === currentText.length) {
+        typingSpeed = 2000; // 完成后暂停
+        isDeleting = true;
+      } else if (isDeleting && charIndex === 0) {
+        isDeleting = false;
+        currentIndex = (currentIndex + 1) % securityKnowledge.length;
+        typingSpeed = 500; // 切换前暂停
+      }
+
+      setTimeout(typeWriter, typingSpeed);
     }
 
-    function updateCompassClock() {
-      const now = new Date();
-      const values = {
-        month: now.getMonth(),
-        day: now.getDate() - 1,
-        weekday: now.getDay(),
-        hour: now.getHours(),
-        minute: now.getMinutes(),
-        second: now.getSeconds()
-      };
-
-      // 更新中心文本
-      clockCenterText.innerHTML = \`
-        <span>\${chineseMonths[values.month]}</span>
-        <span>\${chineseDays[values.day]}</span>
-        <span>\${chineseWeekdays[values.weekday]}</span><br>
-        <span>\${chineseHours[values.hour]}</span>
-        <span>\${chineseMinutes[values.minute]}</span>
-        <span>\${chineseSeconds[values.second]}</span>
-      \`;
-
-      // 更新各环
-      Object.keys(values).forEach(key => {
-        const elements = clockElements[key];
-        if (!elements) return;
-
-        elements.forEach((el, i) => {
-          const isActive = i === values[key];
-          const wasActive = el.classList.contains('active');
-
-          if (isActive && !wasActive) {
-            el.classList.add('active');
-            el.classList.add('rotating');
-            spawnBurstParticles(el);
-
-            setTimeout(() => {
-              el.classList.remove('rotating');
-            }, 600);
-          } else if (!isActive && wasActive) {
-            el.classList.remove('active');
-          }
-        });
-      });
-
-      lastValues = values;
-    }
-
-    // 初始化时钟
-    createCompassClock();
-    updateCompassClock();
-    setInterval(updateCompassClock, 1000);
-
-    // 窗口大小变化时重建时钟
-    let resizeTimeout;
-    window.addEventListener('resize', () => {
-      clearTimeout(resizeTimeout);
-      resizeTimeout = setTimeout(() => {
-        // 清除现有元素
-        const items = compassClock.querySelectorAll('.clock-item');
-        items.forEach(item => item.remove());
-        clockElements = {};
-        createCompassClock();
-        updateCompassClock();
-      }, 200);
-    });
+    // 启动打字机效果
+    typeWriter();
 
     // === Docker 发行版切换 ===
     const distroTabs = document.querySelectorAll('.distro-tab');
