@@ -139,41 +139,40 @@ const HTML = `<!DOCTYPE html>
       background: rgba(15, 23, 42, 0.96);
       border-radius: 20px;
       padding: 20px 20px 18px;
-      box-shadow: 0 20px 40px rgba(15, 23, 42, 0.9), 0 0 30px rgba(34, 197, 94, 0.1);
-      border: 1px solid transparent;
+      box-shadow: 0 20px 40px rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(56, 189, 248, 0.3);
       backdrop-filter: blur(14px);
       margin-bottom: 20px;
       position: relative;
-      overflow: hidden;
+      overflow: visible;
     }
     .card::before {
       content: '';
       position: absolute;
-      top: -2px;
-      left: -2px;
-      right: -2px;
-      bottom: -2px;
-      background: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000);
-      background-size: 400%;
-      border-radius: 22px;
-      z-index: -1;
-      animation: borderRotate 8s linear infinite;
+      width: 20px;
+      height: 20px;
+      background: radial-gradient(circle, #fff 0%, currentColor 50%, transparent 70%);
+      border-radius: 50%;
+      filter: blur(3px);
+      z-index: 10;
+      animation: particleMove 6s linear infinite, colorChange 3s linear infinite;
     }
-    .card::after {
-      content: '';
-      position: absolute;
-      top: 2px;
-      left: 2px;
-      right: 2px;
-      bottom: 2px;
-      background: rgba(15, 23, 42, 0.96);
-      border-radius: 18px;
-      z-index: -1;
+    @keyframes particleMove {
+      0% { top: -10px; left: 20px; }
+      25% { top: 20px; left: calc(100% - 10px); }
+      50% { top: calc(100% - 10px); left: calc(100% - 40px); }
+      75% { top: calc(100% - 40px); left: -10px; }
+      100% { top: -10px; left: 20px; }
     }
-    @keyframes borderRotate {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
+    @keyframes colorChange {
+      0% { color: #ff0000; box-shadow: 0 0 20px #ff0000, 0 0 40px #ff0000; }
+      14% { color: #ff7300; box-shadow: 0 0 20px #ff7300, 0 0 40px #ff7300; }
+      28% { color: #fffb00; box-shadow: 0 0 20px #fffb00, 0 0 40px #fffb00; }
+      42% { color: #48ff00; box-shadow: 0 0 20px #48ff00, 0 0 40px #48ff00; }
+      57% { color: #00ffd5; box-shadow: 0 0 20px #00ffd5, 0 0 40px #00ffd5; }
+      71% { color: #002bff; box-shadow: 0 0 20px #002bff, 0 0 40px #002bff; }
+      85% { color: #7a00ff; box-shadow: 0 0 20px #7a00ff, 0 0 40px #7a00ff; }
+      100% { color: #ff0000; box-shadow: 0 0 20px #ff0000, 0 0 40px #ff0000; }
     }
 
     .field {
@@ -331,36 +330,23 @@ const HTML = `<!DOCTYPE html>
       background: rgba(15, 23, 42, 0.96);
       border-radius: 20px;
       padding: 20px;
-      box-shadow: 0 20px 40px rgba(15, 23, 42, 0.9), 0 0 30px rgba(6, 182, 212, 0.1);
-      border: 1px solid transparent;
+      box-shadow: 0 20px 40px rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(56, 189, 248, 0.3);
       backdrop-filter: blur(14px);
       margin-bottom: 20px;
       position: relative;
-      overflow: hidden;
+      overflow: visible;
     }
     .docker-card::before {
       content: '';
       position: absolute;
-      top: -2px;
-      left: -2px;
-      right: -2px;
-      bottom: -2px;
-      background: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000);
-      background-size: 400%;
-      border-radius: 22px;
-      z-index: -1;
-      animation: borderRotate 8s linear infinite reverse;
-    }
-    .docker-card::after {
-      content: '';
-      position: absolute;
-      top: 2px;
-      left: 2px;
-      right: 2px;
-      bottom: 2px;
-      background: rgba(15, 23, 42, 0.96);
-      border-radius: 18px;
-      z-index: -1;
+      width: 20px;
+      height: 20px;
+      background: radial-gradient(circle, #fff 0%, currentColor 50%, transparent 70%);
+      border-radius: 50%;
+      filter: blur(3px);
+      z-index: 10;
+      animation: particleMove 6s linear infinite reverse, colorChange 3s linear infinite;
     }
 
     .docker-card h3 {
@@ -532,24 +518,82 @@ const HTML = `<!DOCTYPE html>
     }
 
     @media (max-width: 640px) {
+      .page {
+        padding: 8px 12px 20px;
+      }
+      .header-title {
+        font-size: 22px;
+      }
+      .header-sub {
+        font-size: 12px;
+      }
       .card, .docker-card {
         padding: 16px 14px 14px;
+        border-radius: 16px;
       }
-      .compass-clock {
-        width: 95vw;
-        height: 95vw;
+      .card::before, .docker-card::before {
+        width: 15px;
+        height: 15px;
+        filter: blur(2px);
       }
-      .clock-item {
+      @keyframes particleMove {
+        0% { top: -8px; left: 15px; }
+        25% { top: 15px; left: calc(100% - 8px); }
+        50% { top: calc(100% - 8px); left: calc(100% - 30px); }
+        75% { top: calc(100% - 30px); left: -8px; }
+        100% { top: -8px; left: 15px; }
+      }
+      .field label {
+        font-size: 12px;
+      }
+      .field small {
         font-size: 10px;
       }
-      .clock-center-text {
+      input, textarea {
         font-size: 12px;
+        padding: 8px 10px;
+      }
+      .btn {
+        font-size: 12px;
+        padding: 0 12px;
       }
       .output-row {
         flex-direction: column;
       }
       .btn {
         justify-content: center;
+        min-height: 36px;
+      }
+      .distro-tabs {
+        gap: 4px;
+      }
+      .distro-tab {
+        padding: 5px 10px;
+        font-size: 10px;
+      }
+      .code-block {
+        font-size: 11px;
+        padding: 10px;
+      }
+      .info-panel {
+        width: 240px;
+        font-size: 10px;
+        padding: 8px 10px;
+      }
+    }
+
+    @media (max-width: 400px) {
+      .header-title {
+        font-size: 18px;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .typewriter-text {
+        font-size: 12px;
+      }
+      .card::before, .docker-card::before {
+        width: 12px;
+        height: 12px;
       }
     }
   </style>
