@@ -965,7 +965,8 @@ docker info | grep -A 5 "Registry Mirrors"</pre>
       if (!/^https?:\\/\\//i.test(url)) {
         url = "https://" + url;
       }
-      return url.replace(/\\/+/g, "/").replace(/\\/+$/, "");
+      // 只替换路径中的多余斜杠，不影响 ://
+      return url.replace(/([^:])\\/{2,}/g, "$1/").replace(/\\/+$/, "");
     }
 
     function detectPlatform(u, raw) {
