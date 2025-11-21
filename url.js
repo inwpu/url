@@ -46,7 +46,7 @@ const HTML = `<!DOCTYPE html>
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 20px 16px 36px;
+      padding: 12px 16px 24px;
     }
     .main {
       width: 100%;
@@ -54,7 +54,7 @@ const HTML = `<!DOCTYPE html>
     }
 
     .header {
-      margin-bottom: 20px;
+      margin-bottom: 10px;
       text-align: center;
     }
     .header-title {
@@ -86,8 +86,8 @@ const HTML = `<!DOCTYPE html>
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: 180px;
-      padding: 20px 20px 30px;
+      min-height: 100px;
+      padding: 15px 20px;
     }
 
     .typewriter-container {
@@ -101,9 +101,9 @@ const HTML = `<!DOCTYPE html>
     }
 
     .typewriter-text {
-      font-size: 18px;
+      font-size: 16px;
       color: #22c55e;
-      line-height: 1.6;
+      line-height: 1.5;
       font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
       text-shadow: 0 0 20px rgba(34, 197, 94, 0.5);
     }
@@ -124,20 +124,12 @@ const HTML = `<!DOCTYPE html>
       51%, 100% { opacity: 0; }
     }
 
-    .typewriter-title {
-      font-size: 12px;
-      color: #9ca3af;
-      margin-bottom: 12px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-    }
-
     @media (max-width: 640px) {
       .typewriter-text {
-        font-size: 14px;
+        font-size: 13px;
       }
       .typewriter-section {
-        min-height: 140px;
+        min-height: 80px;
       }
     }
 
@@ -206,35 +198,32 @@ const HTML = `<!DOCTYPE html>
       min-height: 64px;
       resize: vertical;
     }
+    textarea#commandText {
+      min-height: 80px;
+      resize: none;
+      overflow: hidden;
+    }
 
     /* 输入框发光流动动画 */
-    .glow-input-wrapper {
+    input, textarea {
       position: relative;
-      overflow: hidden;
-      border-radius: 10px;
     }
-    .glow-input-wrapper::before {
-      content: '';
-      position: absolute;
-      top: -2px;
-      left: -2px;
-      right: -2px;
-      bottom: -2px;
-      background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.6), rgba(34, 197, 94, 0.6), transparent);
-      background-size: 200% 100%;
-      animation: glowFlow 3s linear infinite;
-      border-radius: 12px;
-      z-index: -1;
-      opacity: 0;
-      transition: opacity 0.3s ease;
+    input:focus, textarea:focus {
+      animation: borderGlow 2s ease-in-out infinite;
     }
-    .glow-input-wrapper:focus-within::before {
-      opacity: 1;
-    }
-
-    @keyframes glowFlow {
-      0% { background-position: -200% 0; }
-      100% { background-position: 200% 0; }
+    @keyframes borderGlow {
+      0%, 100% {
+        box-shadow: 0 0 15px rgba(56, 189, 248, 0.4), 0 0 30px rgba(34, 197, 94, 0.2), inset 0 0 10px rgba(56, 189, 248, 0.05);
+      }
+      25% {
+        box-shadow: 0 0 20px rgba(34, 197, 94, 0.5), 0 0 40px rgba(56, 189, 248, 0.3), inset 0 0 15px rgba(34, 197, 94, 0.08);
+      }
+      50% {
+        box-shadow: 0 0 25px rgba(56, 189, 248, 0.5), 0 0 50px rgba(34, 197, 94, 0.3), inset 0 0 15px rgba(56, 189, 248, 0.1);
+      }
+      75% {
+        box-shadow: 0 0 20px rgba(34, 197, 94, 0.5), 0 0 40px rgba(56, 189, 248, 0.3), inset 0 0 15px rgba(34, 197, 94, 0.08);
+      }
     }
 
     .output-row {
@@ -565,7 +554,6 @@ const HTML = `<!DOCTYPE html>
       <!-- 打字机效果 -->
       <section class="typewriter-section">
         <div class="typewriter-container">
-          <div class="typewriter-title">Cybersecurity Knowledge</div>
           <div class="typewriter-wrapper">
             <span class="typewriter-text" id="typewriterText"></span><span class="typewriter-cursor" id="typewriterCursor"></span>
           </div>
@@ -770,7 +758,7 @@ docker info | grep -A 5 "Registry Mirrors"</pre>
     const ctx = canvas.getContext('2d');
     let particles = [];
     let animationId;
-    let mouse = { x: null, y: null, radius: 150 };
+    let mouse = { x: null, y: null, radius: 200 };
 
     canvas.style.pointerEvents = 'auto';
 
@@ -800,12 +788,12 @@ docker info | grep -A 5 "Registry Mirrors"</pre>
         this.y = Math.random() * canvas.height;
         this.baseX = this.x;
         this.baseY = this.y;
-        this.size = Math.random() * 2.5 + 0.8;
+        this.size = Math.random() * 3 + 1;
         this.speedX = (Math.random() - 0.5) * 0.8;
         this.speedY = (Math.random() - 0.5) * 0.8;
-        this.opacity = Math.random() * 0.6 + 0.3;
+        this.opacity = Math.random() * 0.7 + 0.3;
         this.hue = Math.random() * 60 + 120; // 绿色到青色
-        this.density = (Math.random() * 30) + 1;
+        this.density = (Math.random() * 40) + 5;
       }
 
       update() {
@@ -901,10 +889,10 @@ docker info | grep -A 5 "Registry Mirrors"</pre>
           const dist = Math.sqrt(dx * dx + dy * dy);
 
           if (dist < mouse.radius) {
-            const opacity = (1 - dist / mouse.radius) * 0.5;
+            const opacity = (1 - dist / mouse.radius) * 0.8;
             ctx.beginPath();
             ctx.strokeStyle = \`rgba(56, 189, 248, \${opacity})\`;
-            ctx.lineWidth = 1;
+            ctx.lineWidth = 1.5;
             ctx.moveTo(particles[i].x, particles[i].y);
             ctx.lineTo(mouse.x, mouse.y);
             ctx.stroke();
@@ -1212,6 +1200,11 @@ docker info | grep -A 5 "Registry Mirrors"</pre>
       cmdOutput.value = cmdText;
       if (cmdText) {
         cmdHint.textContent = "已为 " + platform.name + " 生成推荐命令，可直接复制到终端执行（按需修改）。";
+        // 自动调整文本框高度
+        cmdOutput.style.height = 'auto';
+        cmdOutput.style.height = cmdOutput.scrollHeight + 'px';
+      } else {
+        cmdOutput.style.height = '80px';
       }
     }
 
@@ -1267,27 +1260,87 @@ docker info | grep -A 5 "Registry Mirrors"</pre>
     const typewriterText = document.getElementById('typewriterText');
 
     const securityKnowledge = [
-      "AES (Advanced Encryption Standard) 是一种对称加密算法，密钥长度可为128、192或256位",
-      "RSA 算法基于大整数分解难题，是最广泛使用的公钥密码系统之一",
-      "SHA-256 是一种密码散列函数，输出256位哈希值，广泛用于数字签名和区块链",
-      "零知识证明允许一方向另一方证明某个陈述为真，而无需透露任何额外信息",
-      "侧信道攻击通过分析功耗、电磁辐射或时间信息来破解密码系统",
-      "可信执行环境 (TEE) 提供硬件隔离的安全区域，保护敏感数据和代码",
-      "物理不可克隆函数 (PUF) 利用芯片制造过程中的随机变化生成唯一密钥",
-      "差分功耗分析 (DPA) 是一种通过统计分析功耗轨迹来提取密钥的攻击方法",
-      "同态加密允许在加密数据上直接进行计算，而无需先解密",
-      "椭圆曲线密码学 (ECC) 以较短的密钥提供与RSA相当的安全性",
-      "安全多方计算 (MPC) 允许多方共同计算函数而不泄露各自的输入",
-      "格密码学被认为是抗量子计算攻击的后量子密码方案的基础",
-      "硬件安全模块 (HSM) 是用于管理和保护数字密钥的专用加密处理器",
-      "JTAG 调试接口可能被攻击者利用来提取固件或绕过安全机制",
-      "缓冲区溢出攻击通过向程序输入超出预期的数据来覆盖内存中的关键数据",
-      "Return-Oriented Programming (ROP) 利用现有代码片段构造恶意程序",
-      "ASLR (地址空间布局随机化) 通过随机化内存地址来防御内存攻击",
-      "Secure Boot 确保设备只能启动经过验证的固件和操作系统",
-      "Fault Injection 攻击通过电压毛刺或激光照射来诱发芯片错误",
-      "Post-Quantum Cryptography 研究能够抵抗量子计算机攻击的密码算法"
-    ];
+  "在现代网络空间安全体系中，密码算法不仅要求数学安全性，还必须确保实现过程无显著侧信道泄漏，因为即便 AES 或 RSA 本身安全，若密钥调度、S盒查找或模幂操作在缓存访问上产生规律，也可能被攻击者通过时间测量或功耗分析恢复密钥。",
+  
+  "芯片安全的硅前验证侧重在 RTL 与门级设计阶段，通过形式化验证、符号执行、等价性检查和信息流追踪及时发现硬件设计中可能引入的权限绕过路径、后门触发条件与敏感信号泄露，而这些问题若进入硅后阶段将难以修补。",
+  
+  "在硅后安全验证阶段，工程师会结合功耗分析、时钟毛刺、电压注入、EM 旁道与激光故障注入等物理攻击手段，对实际芯片进行安全评估；只有在真实物理条件下才能检验芯片是否能抵抗高阶侧信道攻击与故障诱导。",
+  
+  "硬件安全仿真常使用 Verilator 或商业 EDA 工具将 RTL 转换为高性能 C++ 仿真器，通过插桩技术监控信号传递路径与内部寄存器状态，从而帮助研究人员评估硬件木马触发条件、秘密寄存器泄露点以及敏感数据在多周期操作中的传播行为。",
+  
+  "密码学中常见的同态加密、零知识证明与多方安全计算虽然具有极强的隐私保护能力，但在硬件上实现这些算法时需要特别注意控制流一致性与内存访问模式，以避免因实现漏洞导致计算泄露隐私数据或被推测中间值。",
+  
+  "可信执行环境（如 ARM TrustZone、Intel SGX）提供了隔离的敏感代码运行区，但如果 SoC 总线缺乏完整的访问权限检查，恶意外设仍可能通过 DMA 从受保护内存窃取数据，因此总线仲裁器与内存控制器的权限验证逻辑至关重要。",
+  
+  "在大规模 SoC 中，AXI、APB、AHB 等总线协议的安全性直接影响整个系统的隔离能力；攻击者若能伪造总线事务、提升事务优先级或构造非法突发访问模式，就可能绕过访问控制逻辑，因此需要在 RTL 层加入事务级安全断言。",
+  
+  "PUF（物理不可克隆函数）可为芯片提供唯一且不可复制的密钥，但在实际部署中需要进行稳定性增强处理，例如使用模糊提取器、纠错码和稳定挑战集，否则环境变化可能导致密钥重构失败，使安全启动过程不可靠。",
+  
+  "硬件木马检测不仅需要静态结构分析，还需要基于仿真的动态行为分析；例如对比正常路径与可疑触发路径的状态覆盖率，结合符号执行探索低概率触发条件，以捕获那些隐藏在深层逻辑中的后门激活信号。",
+  
+  "在加密 IP 核的硅前验证中，常通过信息流静态分析（GLIFT/RTLIFT）追踪密钥位如何在组合与时序逻辑中传播，以确保不会经由调试接口、测试模式、冗余寄存器或日志模块意外泄露，加密 IP 供应链也必须具有可验证性。",
+  
+  "芯片设计中的 DFT（可测试性设计）结构如 Scan Chain 若未进行加密或锁定，攻击者可以通过扫描链读出寄存器值，甚至提取 AES 轮密钥；因此安全设计中必须加入 Scan Chain 保护，例如锁住扫描链或进行安全扫描模式切换。",
+  
+  "在网络安全体系中，侧信道攻击常被误解为仅与硬件有关，但实际上 TLS、VPN、密码库等软件若在执行序列、缓存访问或内存分配上表现出数据相关性，也同样会遭受缓存侧信道攻击，因此现代密码库必须采用常数时间实现。",
+  
+  "在 FPGA 上实现加密算法时，由于可重构逻辑的物理布局可被推测，因此功耗轨迹往往更加一致，容易遭受差分功耗分析；为了提高安全性，需要采用随机掩码、随机时钟、平衡电路或双轨对称逻辑降低可观察度。",
+  
+  "硅前形式化验证不仅用于验证功能正确性，也可用于验证安全属性，例如证明“密钥不会从非可信端口泄露”、“调试接口在量产模式下始终关闭”与“权限位被篡改后不会提升访问能力”，这些验证依赖 SAT/SMT 求解器和时序属性模型。",
+  
+  "TrustZone 的安全依赖于 Monitor 模式切换与内存访问权限的严格配置，但若 Bootloader 未正确锁定 TZASC（TrustZone Address Space Controller），攻击者可以在早期引导阶段劫持控制权并访问安全世界内存，从而破坏整个根信任链。",
+  
+  "芯片安全仿真中常用并行化符号执行技术探索大规模 RTL 状态空间，通过将输入信号符号化，可以自动生成触发边界条件、稀有状态和异常访问模式的激励信号，从而发现普通测试激励难以触达的深层安全漏洞。",
+  
+  "在 SoC 设计中，片上网络（NoC）成为新的攻击面；如果路由器缺乏安全路由策略，恶意 IP 可以注入伪造数据包、劫持流量路径或造成拒绝服务，因此必须在 NoC 层加入身份认证、带宽隔离和流量监测机制。",
+  
+  "硅前安全验证常通过 Assertion-Based Verification（ABV）定义关键安全属性，如“密钥寄存器在状态切换后必须被清零”、“非法事务不得更新配置寄存器”、“调试模式仅在加密认证后允许开启”，这些属性依赖 PSL/SVA 等时序语言表达。",
+  
+  "故障注入仿真可以在 RTL 级别模拟比特翻转、时序错误、寄存器软错误等情况，用于验证加密模块是否能正确检测和修复错误；如果 AES、RSA 或 ECC 实现缺乏故障检测，攻击者可利用故障注入恢复密钥或生成伪造签名。",
+  
+  "在密码 IP 的供应链安全中，非法修改第三方加密 IP 是重大风险；通过 RTL 指纹、结构化哈希、等价性检查和行为熵分析可以验证接收到的 IP 是否被篡改，避免木马通过供应链渗入安全关键芯片中。",
+  
+  "在硅后侧信道分析中，攻击者会捕获芯片在执行加密操作时的功耗波形或电磁辐射特征，利用相关性功耗分析（CPA）或模板攻击等方法推断密钥，因此安全芯片需采用掩码、抖动、功耗平衡等手段降低泄漏强度。",
+  
+  "片上调试接口如 JTAG、SWD 若在量产模式下仍可访问，会为攻击者提供读取内部 RAM、寄存器或固件的能力，因此安全设计中必须添加 JTAG 锁、密码挑战或调试熔断机制，以确保调试功能不会成为绕过 Secure Boot 的入口。",
+  
+  "在硬件木马防御中，稀有事件激励（Rare Trigger Activation）是关键技术，通过符号执行、稀有节点枚举以及仿真覆盖率引导，能够主动寻找那些“只有特定输入序列才能触发”的隐藏逻辑，从而更有效地定位深藏木马。",
+  
+  "信息流安全验证（Information Flow Tracking）能够分析密钥、随机数、访问控制信号等敏感数据是否在逻辑电路中以非预期方式传播；如果密钥位以组合电路泄露到未授权端口，将被视为严重安全缺陷，必须在 RTL 级别修复。",
+  
+  "硬件安全不仅关注算法，也关注物理实现，例如 AES 的查表实现（T-table）容易暴露密钥相关的缓存访问模式，而基于位切片（bit-slicing）或常数时间 S盒的实现方式则显著降低缓存式侧信道风险，是现代密码实现的最佳实践。",
+  
+  // ===== 机器学习 / 深度学习 / 强化学习 结合安全与芯片验证 =====
+  
+  "在网络空间安全领域，机器学习最常见的应用之一是入侵检测与流量分类，利用监督学习模型从海量网络流量中自动学习恶意模式，但如果训练数据分布与真实环境差异过大，模型容易出现高误报或被对抗样本绕过，因此需要持续更新与在线学习机制。",
+  
+  "深度学习在侧信道分析中被证明具有强大能力，攻击者可以将芯片功耗或电磁波形视为时间序列或二维“图像”，训练卷积神经网络（CNN）或循环神经网络（RNN）直接从原始轨迹中恢复密钥，大幅减少对手工特征工程的依赖，也迫使防御方重新审视随机掩码的有效性。",
+  
+  "在硬件木马检测中，研究人员常利用机器学习对电路结构图进行建模，例如将门级网表转换为图结构，使用图神经网络（GNN）自动学习“正常电路”和“可疑逻辑”的差异；配合 TrustHub 等公开数据集，可以训练出对未知木马具有一定泛化能力的检测器。",
+  
+  "针对 SoC 设计的硅前验证，强化学习可以用来引导测试激励和符号执行的路径选择策略：将每次探索新的可疑状态或触发潜在安全断言视为正奖励，模型通过不断交互学习出更高效的搜索策略，缓解传统 DFS/BFS 在巨大状态空间中路径爆炸的问题。",
+  
+  "在模糊测试（Fuzzing）与符号执行结合的混合验证框架中，强化学习可以根据覆盖率增量、断言触发情况和路径新颖度动态调整输入变异策略与种子队列调度策略，从而在有限时间内优先探索更可能触发安全漏洞的路径，提升验证效率。",
+  
+  "面向片上网络（NoC）的安全监测中，可通过深度学习对网络流量进行时间序列建模：例如使用 LSTM、Transformer 或变分自编码器（VAE）学习正常通信的时序模式，一旦检测到明显偏离（如异常突发流量、持续探测行为或恶意拥塞），即可触发告警并进行流量隔离。",
+  
+  "在加密算法硬件实现的侧信道防护评估中，研究者可以利用生成对抗网络（GAN）模拟攻击者视角，生成更复杂、更难防御的功耗或电磁攻击样本，并反过来用这些样本来训练和加固防护机制，从而形成类似“攻防对抗训练”的闭环优化。",
+  
+  "深度学习在恶意软件分类和流量识别中广泛使用，但模型本身也面临对抗样本威胁：攻击者通过对输入添加精心构造的微小扰动，使得模型将恶意行为误判为正常；因此在安全域部署 ML 模型时必须考虑鲁棒性验证和对抗训练，而不仅仅追求精度指标。",
+  
+  "随着 AI 加速器与神经网络处理单元（NPU）在数据中心和终端设备中普及，这些专用芯片本身也成为安全研究对象；其微架构优化（如稀疏计算、片上缓存、权重量化）可能暴露新的侧信道载体，需要在设计阶段评估是否会泄露模型参数或用户输入。",
+  
+  "在智能网联设备与边缘计算场景中，联邦学习被用来在不集中数据的前提下训练全局模型，但如果参与方恶意上传带偏见的梯度更新，就可能发起模型投毒攻击；为此需要在联邦学习框架中引入鲁棒聚合、异常检测和参与方信誉评估机制。",
+  
+  "在芯片安全验证的流程管理中，机器学习还可以辅助分析大规模仿真和验证日志，例如自动聚类失败用例、从失败轨迹中提取共性模式、预测哪些模块更可能存在安全缺陷，从而帮助验证工程师更有针对性地分配计算资源和人工审查精力。",
+  
+  "针对硬件实现的密码算法，研究者可以利用强化学习来自动搜索最“危险”的故障注入时刻与位置，将注入成效（如是否破坏校验、是否泄露中间值）作为奖励信号，逐步学习出比人工经验更高效的故障攻击策略，反过来帮助设计更稳健的防护机制。",
+  
+  "在静态代码与 RTL 安全审计中，传统基于规则的检测方法往往难以覆盖复杂语境，因而越来越多研究尝试将源代码、HDL 或中间表示转换为图结构或序列表示，结合 Transformer、GNN 等深度模型自动学习漏洞模式，为大规模安全审计和补丁推荐提供辅助。",
+  
+  "当机器学习被用于密钥管理、访问控制和异常检测等安全关键决策时，需要引入“可解释性安全”的概念：不仅要知道模型给出“允许/拒绝/告警”的结果，还要能够追踪其依据的特征与路径，以便在面对攻击或误判时进行审计和可信追责。"
+];
+
 
     let currentIndex = 0;
     let charIndex = 0;
