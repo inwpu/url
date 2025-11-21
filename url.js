@@ -140,8 +140,7 @@ const HTML = `<!DOCTYPE html>
       border-radius: 20px;
       padding: 20px 20px 18px;
       box-shadow: 0 20px 40px rgba(15, 23, 42, 0.9);
-      border: 2px solid;
-      border-image: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8) 1;
+      border: 2px solid #ff0000;
       animation: borderColorChange 8s linear infinite;
       backdrop-filter: blur(14px);
       margin-bottom: 20px;
@@ -151,33 +150,41 @@ const HTML = `<!DOCTYPE html>
     .card::before {
       content: '';
       position: absolute;
-      width: 6px;
-      height: 6px;
-      background: #fff;
-      border-radius: 50%;
+      width: 40px;
+      height: 4px;
+      background: linear-gradient(90deg, transparent, #fff, transparent);
+      border-radius: 4px;
       z-index: 10;
-      animation: particleMove 4s linear infinite, particleGlow 2s linear infinite;
+      animation: particleMove 12s linear infinite, particleGlow 3s linear infinite, particleBreathe 2s ease-in-out infinite;
     }
     @keyframes particleMove {
-      0% { top: -3px; left: 10%; }
-      12.5% { top: -3px; left: 90%; }
-      25% { top: -3px; left: calc(100% - 3px); }
-      37.5% { top: 50%; left: calc(100% - 3px); }
-      50% { top: calc(100% - 3px); left: calc(100% - 3px); }
-      62.5% { top: calc(100% - 3px); left: 10%; }
-      75% { top: calc(100% - 3px); left: -3px; }
-      87.5% { top: 50%; left: -3px; }
-      100% { top: -3px; left: -3px; }
+      0% { top: -3px; left: 5%; transform: rotate(0deg); }
+      12.5% { top: -3px; left: 85%; transform: rotate(0deg); }
+      12.6% { transform: rotate(90deg); }
+      25% { top: 5%; left: calc(100% - 1px); transform: rotate(90deg); }
+      37.5% { top: 85%; left: calc(100% - 1px); transform: rotate(90deg); }
+      37.6% { transform: rotate(180deg); }
+      50% { top: calc(100% - 1px); left: 85%; transform: rotate(180deg); }
+      62.5% { top: calc(100% - 1px); left: 5%; transform: rotate(180deg); }
+      62.6% { transform: rotate(270deg); }
+      75% { top: 85%; left: -3px; transform: rotate(270deg); }
+      87.5% { top: 5%; left: -3px; transform: rotate(270deg); }
+      87.6% { transform: rotate(360deg); }
+      100% { top: -3px; left: 5%; transform: rotate(360deg); }
     }
     @keyframes particleGlow {
-      0% { box-shadow: 0 0 6px #ff0000, 0 0 12px #ff0000; background: #ff0000; }
-      14% { box-shadow: 0 0 6px #ff7300, 0 0 12px #ff7300; background: #ff7300; }
-      28% { box-shadow: 0 0 6px #fffb00, 0 0 12px #fffb00; background: #fffb00; }
-      42% { box-shadow: 0 0 6px #48ff00, 0 0 12px #48ff00; background: #48ff00; }
-      57% { box-shadow: 0 0 6px #00ffd5, 0 0 12px #00ffd5; background: #00ffd5; }
-      71% { box-shadow: 0 0 6px #002bff, 0 0 12px #002bff; background: #002bff; }
-      85% { box-shadow: 0 0 6px #7a00ff, 0 0 12px #7a00ff; background: #7a00ff; }
-      100% { box-shadow: 0 0 6px #ff0000, 0 0 12px #ff0000; background: #ff0000; }
+      0% { box-shadow: 0 0 8px #ff0000, 0 0 20px #ff0000, 0 0 30px #ff0000; background: linear-gradient(90deg, transparent, #ff0000, transparent); }
+      14% { box-shadow: 0 0 8px #ff7300, 0 0 20px #ff7300, 0 0 30px #ff7300; background: linear-gradient(90deg, transparent, #ff7300, transparent); }
+      28% { box-shadow: 0 0 8px #fffb00, 0 0 20px #fffb00, 0 0 30px #fffb00; background: linear-gradient(90deg, transparent, #fffb00, transparent); }
+      42% { box-shadow: 0 0 8px #48ff00, 0 0 20px #48ff00, 0 0 30px #48ff00; background: linear-gradient(90deg, transparent, #48ff00, transparent); }
+      57% { box-shadow: 0 0 8px #00ffd5, 0 0 20px #00ffd5, 0 0 30px #00ffd5; background: linear-gradient(90deg, transparent, #00ffd5, transparent); }
+      71% { box-shadow: 0 0 8px #002bff, 0 0 20px #002bff, 0 0 30px #002bff; background: linear-gradient(90deg, transparent, #002bff, transparent); }
+      85% { box-shadow: 0 0 8px #7a00ff, 0 0 20px #7a00ff, 0 0 30px #7a00ff; background: linear-gradient(90deg, transparent, #7a00ff, transparent); }
+      100% { box-shadow: 0 0 8px #ff0000, 0 0 20px #ff0000, 0 0 30px #ff0000; background: linear-gradient(90deg, transparent, #ff0000, transparent); }
+    }
+    @keyframes particleBreathe {
+      0%, 100% { width: 30px; height: 3px; opacity: 0.7; }
+      50% { width: 50px; height: 5px; opacity: 1; }
     }
     @keyframes borderColorChange {
       0% { border-color: #ff0000; }
@@ -346,7 +353,7 @@ const HTML = `<!DOCTYPE html>
       border-radius: 20px;
       padding: 20px;
       box-shadow: 0 20px 40px rgba(15, 23, 42, 0.9);
-      border: 2px solid;
+      border: 2px solid #ff0000;
       animation: borderColorChange 8s linear infinite reverse;
       backdrop-filter: blur(14px);
       margin-bottom: 20px;
@@ -356,12 +363,12 @@ const HTML = `<!DOCTYPE html>
     .docker-card::before {
       content: '';
       position: absolute;
-      width: 6px;
-      height: 6px;
-      background: #fff;
-      border-radius: 50%;
+      width: 40px;
+      height: 4px;
+      background: linear-gradient(90deg, transparent, #fff, transparent);
+      border-radius: 4px;
       z-index: 10;
-      animation: particleMove 4s linear infinite reverse, particleGlow 2s linear infinite;
+      animation: particleMove 12s linear infinite reverse, particleGlow 3s linear infinite, particleBreathe 2s ease-in-out infinite;
     }
 
     .docker-card h3 {
@@ -547,8 +554,8 @@ const HTML = `<!DOCTYPE html>
         border-radius: 16px;
       }
       .card::before, .docker-card::before {
-        width: 5px;
-        height: 5px;
+        width: 30px;
+        height: 3px;
       }
       .field label {
         font-size: 12px;
@@ -599,8 +606,8 @@ const HTML = `<!DOCTYPE html>
         font-size: 12px;
       }
       .card::before, .docker-card::before {
-        width: 4px;
-        height: 4px;
+        width: 24px;
+        height: 2px;
       }
     }
   </style>
