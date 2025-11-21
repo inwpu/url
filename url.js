@@ -191,8 +191,19 @@ const HTML = `<!DOCTYPE html>
     }
     input:focus, textarea:focus {
       border-color: #38bdf8;
-      box-shadow: 0 0 25px rgba(56, 189, 248, 0.4), 0 0 50px rgba(34, 197, 94, 0.2), inset 0 0 15px rgba(56, 189, 248, 0.1);
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.35), 0 0 40px rgba(34, 197, 94, 0.15), inset 0 0 12px rgba(56, 189, 248, 0.08);
       background: rgba(15, 23, 42, 0.95);
+      animation: inputGlow 3s ease-in-out infinite;
+    }
+    @keyframes inputGlow {
+      0%, 100% {
+        border-color: #38bdf8;
+        box-shadow: 0 0 20px rgba(56, 189, 248, 0.35), 0 0 40px rgba(34, 197, 94, 0.15), inset 0 0 12px rgba(56, 189, 248, 0.08);
+      }
+      50% {
+        border-color: #22c55e;
+        box-shadow: 0 0 20px rgba(34, 197, 94, 0.35), 0 0 40px rgba(56, 189, 248, 0.15), inset 0 0 12px rgba(34, 197, 94, 0.08);
+      }
     }
     textarea {
       min-height: 64px;
@@ -204,27 +215,6 @@ const HTML = `<!DOCTYPE html>
       overflow: hidden;
     }
 
-    /* 输入框发光流动动画 */
-    input, textarea {
-      position: relative;
-    }
-    input:focus, textarea:focus {
-      animation: borderGlow 2s ease-in-out infinite;
-    }
-    @keyframes borderGlow {
-      0%, 100% {
-        box-shadow: 0 0 15px rgba(56, 189, 248, 0.4), 0 0 30px rgba(34, 197, 94, 0.2), inset 0 0 10px rgba(56, 189, 248, 0.05);
-      }
-      25% {
-        box-shadow: 0 0 20px rgba(34, 197, 94, 0.5), 0 0 40px rgba(56, 189, 248, 0.3), inset 0 0 15px rgba(34, 197, 94, 0.08);
-      }
-      50% {
-        box-shadow: 0 0 25px rgba(56, 189, 248, 0.5), 0 0 50px rgba(34, 197, 94, 0.3), inset 0 0 15px rgba(56, 189, 248, 0.1);
-      }
-      75% {
-        box-shadow: 0 0 20px rgba(34, 197, 94, 0.5), 0 0 40px rgba(56, 189, 248, 0.3), inset 0 0 15px rgba(34, 197, 94, 0.08);
-      }
-    }
 
     .output-row {
       display: flex;
