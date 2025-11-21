@@ -158,19 +158,15 @@ const HTML = `<!DOCTYPE html>
       animation: particleMove 12s linear infinite, particleGlow 3s linear infinite, particleBreathe 2s ease-in-out infinite;
     }
     @keyframes particleMove {
-      0% { top: -3px; left: 5%; transform: rotate(0deg); }
-      12.5% { top: -3px; left: 85%; transform: rotate(0deg); }
-      12.6% { transform: rotate(90deg); }
-      25% { top: 5%; left: calc(100% - 1px); transform: rotate(90deg); }
-      37.5% { top: 85%; left: calc(100% - 1px); transform: rotate(90deg); }
-      37.6% { transform: rotate(180deg); }
-      50% { top: calc(100% - 1px); left: 85%; transform: rotate(180deg); }
-      62.5% { top: calc(100% - 1px); left: 5%; transform: rotate(180deg); }
-      62.6% { transform: rotate(270deg); }
-      75% { top: 85%; left: -3px; transform: rotate(270deg); }
-      87.5% { top: 5%; left: -3px; transform: rotate(270deg); }
-      87.6% { transform: rotate(360deg); }
-      100% { top: -3px; left: 5%; transform: rotate(360deg); }
+      0% { top: -2px; left: 20px; transform: translateX(0) rotate(0deg); }
+      25% { top: -2px; left: calc(100% - 60px); transform: translateX(0) rotate(0deg); }
+      25.1% { top: 20px; left: calc(100% - 2px); transform: translateY(0) rotate(90deg); }
+      50% { top: calc(100% - 60px); left: calc(100% - 2px); transform: translateY(0) rotate(90deg); }
+      50.1% { top: calc(100% - 2px); left: calc(100% - 60px); transform: translateX(0) rotate(180deg); }
+      75% { top: calc(100% - 2px); left: 20px; transform: translateX(0) rotate(180deg); }
+      75.1% { top: calc(100% - 60px); left: -2px; transform: translateY(0) rotate(270deg); }
+      99.9% { top: 20px; left: -2px; transform: translateY(0) rotate(270deg); }
+      100% { top: -2px; left: 20px; transform: translateX(0) rotate(0deg); }
     }
     @keyframes particleGlow {
       0% { box-shadow: 0 0 8px #ff0000, 0 0 20px #ff0000, 0 0 30px #ff0000; background: linear-gradient(90deg, transparent, #ff0000, transparent); }
