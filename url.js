@@ -140,7 +140,9 @@ const HTML = `<!DOCTYPE html>
       border-radius: 20px;
       padding: 20px 20px 18px;
       box-shadow: 0 20px 40px rgba(15, 23, 42, 0.9);
-      border: 1px solid rgba(56, 189, 248, 0.3);
+      border: 2px solid;
+      border-image: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8) 1;
+      animation: borderColorChange 8s linear infinite;
       backdrop-filter: blur(14px);
       margin-bottom: 20px;
       position: relative;
@@ -149,30 +151,43 @@ const HTML = `<!DOCTYPE html>
     .card::before {
       content: '';
       position: absolute;
-      width: 20px;
-      height: 20px;
-      background: radial-gradient(circle, #fff 0%, currentColor 50%, transparent 70%);
+      width: 6px;
+      height: 6px;
+      background: #fff;
       border-radius: 50%;
-      filter: blur(3px);
       z-index: 10;
-      animation: particleMove 6s linear infinite, colorChange 3s linear infinite;
+      animation: particleMove 4s linear infinite, particleGlow 2s linear infinite;
     }
     @keyframes particleMove {
-      0% { top: -10px; left: 20px; }
-      25% { top: 20px; left: calc(100% - 10px); }
-      50% { top: calc(100% - 10px); left: calc(100% - 40px); }
-      75% { top: calc(100% - 40px); left: -10px; }
-      100% { top: -10px; left: 20px; }
+      0% { top: -3px; left: 10%; }
+      12.5% { top: -3px; left: 90%; }
+      25% { top: -3px; left: calc(100% - 3px); }
+      37.5% { top: 50%; left: calc(100% - 3px); }
+      50% { top: calc(100% - 3px); left: calc(100% - 3px); }
+      62.5% { top: calc(100% - 3px); left: 10%; }
+      75% { top: calc(100% - 3px); left: -3px; }
+      87.5% { top: 50%; left: -3px; }
+      100% { top: -3px; left: -3px; }
     }
-    @keyframes colorChange {
-      0% { color: #ff0000; box-shadow: 0 0 20px #ff0000, 0 0 40px #ff0000; }
-      14% { color: #ff7300; box-shadow: 0 0 20px #ff7300, 0 0 40px #ff7300; }
-      28% { color: #fffb00; box-shadow: 0 0 20px #fffb00, 0 0 40px #fffb00; }
-      42% { color: #48ff00; box-shadow: 0 0 20px #48ff00, 0 0 40px #48ff00; }
-      57% { color: #00ffd5; box-shadow: 0 0 20px #00ffd5, 0 0 40px #00ffd5; }
-      71% { color: #002bff; box-shadow: 0 0 20px #002bff, 0 0 40px #002bff; }
-      85% { color: #7a00ff; box-shadow: 0 0 20px #7a00ff, 0 0 40px #7a00ff; }
-      100% { color: #ff0000; box-shadow: 0 0 20px #ff0000, 0 0 40px #ff0000; }
+    @keyframes particleGlow {
+      0% { box-shadow: 0 0 6px #ff0000, 0 0 12px #ff0000; background: #ff0000; }
+      14% { box-shadow: 0 0 6px #ff7300, 0 0 12px #ff7300; background: #ff7300; }
+      28% { box-shadow: 0 0 6px #fffb00, 0 0 12px #fffb00; background: #fffb00; }
+      42% { box-shadow: 0 0 6px #48ff00, 0 0 12px #48ff00; background: #48ff00; }
+      57% { box-shadow: 0 0 6px #00ffd5, 0 0 12px #00ffd5; background: #00ffd5; }
+      71% { box-shadow: 0 0 6px #002bff, 0 0 12px #002bff; background: #002bff; }
+      85% { box-shadow: 0 0 6px #7a00ff, 0 0 12px #7a00ff; background: #7a00ff; }
+      100% { box-shadow: 0 0 6px #ff0000, 0 0 12px #ff0000; background: #ff0000; }
+    }
+    @keyframes borderColorChange {
+      0% { border-color: #ff0000; }
+      14% { border-color: #ff7300; }
+      28% { border-color: #fffb00; }
+      42% { border-color: #48ff00; }
+      57% { border-color: #00ffd5; }
+      71% { border-color: #002bff; }
+      85% { border-color: #7a00ff; }
+      100% { border-color: #ff0000; }
     }
 
     .field {
@@ -331,7 +346,8 @@ const HTML = `<!DOCTYPE html>
       border-radius: 20px;
       padding: 20px;
       box-shadow: 0 20px 40px rgba(15, 23, 42, 0.9);
-      border: 1px solid rgba(56, 189, 248, 0.3);
+      border: 2px solid;
+      animation: borderColorChange 8s linear infinite reverse;
       backdrop-filter: blur(14px);
       margin-bottom: 20px;
       position: relative;
@@ -340,13 +356,12 @@ const HTML = `<!DOCTYPE html>
     .docker-card::before {
       content: '';
       position: absolute;
-      width: 20px;
-      height: 20px;
-      background: radial-gradient(circle, #fff 0%, currentColor 50%, transparent 70%);
+      width: 6px;
+      height: 6px;
+      background: #fff;
       border-radius: 50%;
-      filter: blur(3px);
       z-index: 10;
-      animation: particleMove 6s linear infinite reverse, colorChange 3s linear infinite;
+      animation: particleMove 4s linear infinite reverse, particleGlow 2s linear infinite;
     }
 
     .docker-card h3 {
@@ -532,16 +547,8 @@ const HTML = `<!DOCTYPE html>
         border-radius: 16px;
       }
       .card::before, .docker-card::before {
-        width: 15px;
-        height: 15px;
-        filter: blur(2px);
-      }
-      @keyframes particleMove {
-        0% { top: -8px; left: 15px; }
-        25% { top: 15px; left: calc(100% - 8px); }
-        50% { top: calc(100% - 8px); left: calc(100% - 30px); }
-        75% { top: calc(100% - 30px); left: -8px; }
-        100% { top: -8px; left: 15px; }
+        width: 5px;
+        height: 5px;
       }
       .field label {
         font-size: 12px;
@@ -592,8 +599,8 @@ const HTML = `<!DOCTYPE html>
         font-size: 12px;
       }
       .card::before, .docker-card::before {
-        width: 12px;
-        height: 12px;
+        width: 4px;
+        height: 4px;
       }
     }
   </style>
