@@ -1048,7 +1048,7 @@ docker info | grep -A 5 "Registry Mirrors"</pre>
           cmds.push("# 下载包文件");
           cmds.push("curl -L '" + url + "' -o " + url.split('/').pop());
         } else {
-          const baseUrl = url.replace(/\\/[^/]*$/, '').replace(/\\/$/, '');
+          const baseUrl = "https://" + host + "/npm";
           cmds.push("# 设置 npm 镜像源（全局）");
           cmds.push("npm config set registry " + baseUrl);
           cmds.push("");
