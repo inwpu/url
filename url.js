@@ -27,7 +27,7 @@ const HTML = `<!DOCTYPE html>
       min-height: 100vh;
       background: radial-gradient(circle at 20% 20%, #0f172a 0, #020617 55%, #01030e 100%);
       color: #f8fafc;
-      overflow: hidden;
+      overflow-x: hidden;
     }
     #particleCanvas {
       position: fixed;
@@ -829,6 +829,9 @@ const HTML = `<!DOCTYPE html>
 
     let clockCtx = null;
     let lastClockState = null;
+    let clockRotation = 0;
+    let clockFrameTime = 0;
+    let clockAnimHandle = null;
 
     function initClockCanvas() {
       if (!clockCanvas) return;
@@ -839,7 +842,7 @@ const HTML = `<!DOCTYPE html>
     function resizeClockCanvas() {
       if (!clockCanvas || !clockCtx) return;
       const parent = clockCanvas.parentElement;
-      const size = parent ? parent.clientWidth : clockCanvas.clientWidth;
+      const size = parent ? parent.clientWidth : clockCanvas.clientWidth || 600;
       const dpr = window.devicePixelRatio || 1;
       clockCanvas.width = size * dpr;
       clockCanvas.height = size * dpr;
@@ -848,11 +851,11 @@ const HTML = `<!DOCTYPE html>
       clockCtx.setTransform(1, 0, 0, 1, 0, 0);
       clockCtx.scale(dpr, dpr);
       if (lastClockState) {
-        drawClockTexture(lastClockState);
+        drawClockTexture(lastClockState, clockRotation);
       }
     }
 
-    function drawClockTexture(state) {
+    function drawClockTexture(state, rotationValue = 0) {
       if (!clockCtx || !state) return;
       const size = clockCanvas.clientWidth;
       const center = size / 2;
@@ -863,6 +866,7 @@ const HTML = `<!DOCTYPE html>
       clockCtx.fillStyle = bg;
       clockCtx.fillRect(0, 0, size, size);
 
+      const rotationSeeds = [0.25, -0.18, 0.12, -0.1, 0.3];
       const rings = [
         { labels: MONTH_LABELS, radius: size * 0.18, highlight: state.month },
         { labels: DAY_LABELS, radius: size * 0.28, highlight: state.day - 1 },
@@ -874,17 +878,17 @@ const HTML = `<!DOCTYPE html>
       rings.forEach((ring, ringIndex) => {
         const step = (Math.PI * 2) / ring.labels.length;
         for (let i = 0; i < ring.labels.length; i++) {
-          const angle = -Math.PI / 2 + i * step;
+          const angle = -Math.PI / 2 + i * step + rotationValue * rotationSeeds[ringIndex];
           const x = center + Math.cos(angle) * ring.radius;
           const y = center + Math.sin(angle) * ring.radius;
           const isActive = i === ring.highlight;
           clockCtx.save();
           clockCtx.translate(x, y);
           clockCtx.rotate(angle + Math.PI / 2);
-          clockCtx.font = (isActive ? "600 " : "400 ") + Math.max(12, size * 0.018) + "px 'Noto Serif SC', 'PingFang SC', serif";
+          clockCtx.font = (isActive ? "600 " : "400 ") + Math.max(13, size * 0.02) + "px 'Noto Serif SC', 'PingFang SC', serif";
           clockCtx.fillStyle = isActive
-            ? "rgba(248, 250, 252, 0.95)"
-            : "rgba(148, 163, 184," + (0.15 + ringIndex * 0.12) + ")";
+            ? "rgba(248, 250, 252, 0.98)"
+            : "rgba(148, 163, 184," + (0.3 + ringIndex * 0.12) + ")";
           clockCtx.textAlign = "center";
           clockCtx.textBaseline = "middle";
           clockCtx.fillText(ring.labels[i], 0, 0);
@@ -895,6 +899,28 @@ const HTML = `<!DOCTYPE html>
           clockCtx.restore();
         }
       });
+    }
+
+    function startClockAnimation() {
+      if (clockAnimHandle) {
+        cancelAnimationFrame(clockAnimHandle);
+      }
+      clockFrameTime = 0;
+      const loop = (timestamp) => {
+        if (!clockCtx || !lastClockState) {
+          clockAnimHandle = requestAnimationFrame(loop);
+          return;
+        }
+        if (!clockFrameTime) {
+          clockFrameTime = timestamp;
+        }
+        const delta = timestamp - clockFrameTime;
+        clockFrameTime = timestamp;
+        clockRotation += delta * 0.0008;
+        drawClockTexture(lastClockState, clockRotation);
+        clockAnimHandle = requestAnimationFrame(loop);
+      };
+      clockAnimHandle = requestAnimationFrame(loop);
     }
 
     function animateChip(el, value) {
@@ -916,7 +942,6 @@ const HTML = `<!DOCTYPE html>
         second: now.getSeconds()
       };
       lastClockState = state;
-      drawClockTexture(state);
       animateChip(cnMonthEl, MONTH_LABELS[state.month]);
       animateChip(cnDayEl, DAY_LABELS[state.day - 1]);
       animateChip(cnWeekEl, WEEK_LABELS[state.weekday]);
@@ -1039,8 +1064,9 @@ const HTML = `<!DOCTYPE html>
     }
 
     initClockCanvas();
-    convert();
     updateClock();
+    startClockAnimation();
+    convert();
     initParticles();
     setInterval(updateClock, 1000);
     initVisitorInfo();
