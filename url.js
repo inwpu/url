@@ -79,109 +79,68 @@ const HTML = `<!DOCTYPE html>
       width: 100%;
       max-width: 1200px;
       display: flex;
-      flex-wrap: wrap;
+      flex-direction: column;
       align-items: center;
-      justify-content: center;
-      gap: 32px;
+      gap: 26px;
     }
-    .compass-wrap {
-      flex: 1 1 520px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .compass-clock {
+    .clock-stage {
       position: relative;
-      width: min(92vw, 540px);
+      width: min(92vw, 900px);
+      margin: 10px auto 32px;
       aspect-ratio: 1 / 1;
       border-radius: 50%;
-      background: radial-gradient(circle at 30% 30%, rgba(56, 189, 248, 0.45), rgba(6, 182, 212, 0.1) 35%, rgba(2, 6, 23, 0.85) 70%);
-      box-shadow:
-        0 24px 60px rgba(2, 6, 23, 0.85),
-        inset 0 0 60px rgba(15, 118, 110, 0.35),
-        0 0 0 2px rgba(148, 163, 184, 0.35);
-      display: flex;
-      align-items: center;
-      justify-content: center;
       overflow: hidden;
+      box-shadow:
+        0 25px 60px rgba(2, 6, 23, 0.85),
+        inset 0 0 60px rgba(59, 130, 246, 0.15);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      background: radial-gradient(circle, rgba(8, 145, 178, 0.08), rgba(7, 89, 133, 0.08) 35%, rgba(2, 6, 23, 0.96) 70%);
     }
-    .compass-inner {
-      position: relative;
-      width: calc(100% - 40px);
-      height: calc(100% - 40px);
+    .clock-stage::after {
+      content: "";
+      position: absolute;
+      inset: 8%;
       border-radius: 50%;
-      border: 1px dashed rgba(148, 163, 184, 0.7);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      border: 1px dashed rgba(148, 163, 184, 0.25);
+      pointer-events: none;
     }
-    .compass-mark {
+    #clockCanvas {
       position: absolute;
-      font-size: 26px;
-      font-weight: 600;
-      color: rgba(241, 245, 249, 0.75);
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      filter: drop-shadow(0 0 22px rgba(34, 211, 238, 0.35));
     }
-    .mark-n { top: 16px; left: 50%; transform: translateX(-50%); }
-    .mark-s { bottom: 16px; left: 50%; transform: translateX(-50%); }
-    .mark-e { right: 18px; top: 50%; transform: translateY(-50%); }
-    .mark-w { left: 18px; top: 50%; transform: translateY(-50%); }
-    .hand {
+    .clock-overlay {
       position: absolute;
-      left: 50%;
-      top: 50%;
-      transform-origin: 50% 100%;
-      transform: translate(-50%, -100%) rotate(0deg);
-      border-radius: 999px;
-      box-shadow: 0 0 12px rgba(59, 130, 246, 0.35);
-    }
-    .hand.hour {
-      width: 8px;
-      height: 120px;
-      background: linear-gradient(180deg, rgba(21, 94, 117, 0.8), rgba(14, 116, 144, 0.95));
-    }
-    .hand.minute {
-      width: 6px;
-      height: 160px;
-      background: linear-gradient(180deg, rgba(16, 185, 129, 0.9), rgba(13, 148, 136, 0.7));
-    }
-    .hand.second {
-      width: 2px;
-      height: 190px;
-      background: linear-gradient(180deg, rgba(248, 250, 252, 1), rgba(59, 130, 246, 0.85));
-      box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
-    }
-    .compass-center {
-      position: absolute;
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      background: #0ea5e9;
-      border: 4px solid rgba(15, 23, 42, 0.85);
-      z-index: 3;
-      box-shadow: 0 0 20px rgba(14, 165, 233, 0.8);
-    }
-    .clock-readout {
-      position: absolute;
-      bottom: 32px;
+      bottom: 40px;
       left: 50%;
       transform: translateX(-50%);
-      text-align: center;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px 12px;
+      padding: 14px 24px;
+      background: rgba(15, 23, 42, 0.55);
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      backdrop-filter: blur(10px);
     }
-    .clock-readout time,
-    .clock-readout div {
-      display: block;
-    }
-    #clockTimeText {
-      font-size: clamp(28px, 4vw, 38px);
+    .clock-chip {
+      font-size: clamp(14px, 2.4vw, 18px);
       letter-spacing: 0.08em;
-      font-variant-numeric: tabular-nums;
+      color: #fdfdfd;
+      text-shadow: 0 0 10px rgba(34, 211, 238, 0.55);
+      transition: transform 0.3s ease, color 0.3s ease;
     }
-    #clockDateText {
-      font-size: 14px;
-      color: rgba(226, 232, 240, 0.85);
-      margin-top: 8px;
+    .clock-chip.pulse {
+      animation: glowPulse 0.8s ease;
+    }
+    @keyframes glowPulse {
+      0% { transform: scale(1); color: #e0f2fe; text-shadow: 0 0 8px rgba(125, 211, 252, 0.6); }
+      40% { transform: scale(1.12); color: #f9fafb; text-shadow: 0 0 25px rgba(6, 182, 212, 0.95); }
+      100% { transform: scale(1); color: #fdfdfd; }
     }
     .card {
       flex: 1 1 360px;
@@ -199,6 +158,42 @@ const HTML = `<!DOCTYPE html>
     .card h2 {
       margin: 0 0 12px;
       font-size: 20px;
+    }
+    .docker-card {
+      max-width: 900px;
+    }
+    .code-block {
+      background: rgba(15, 23, 42, 0.92);
+      border-radius: 12px;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      padding: 12px 14px;
+      font-family: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+      font-size: 13px;
+      line-height: 1.5;
+      overflow: auto;
+      margin: 8px 0 14px;
+    }
+    .distro-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin-top: 12px;
+    }
+    .distro-card {
+      background: rgba(15, 23, 42, 0.7);
+      border-radius: 14px;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      padding: 12px;
+    }
+    .distro-card h4 {
+      margin: 0 0 6px;
+      font-size: 14px;
+      color: #7dd3fc;
+    }
+    .distro-card code {
+      font-family: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+      font-size: 12px;
+      color: #f8fafc;
     }
     .field {
       margin-bottom: 16px;
@@ -380,14 +375,18 @@ const HTML = `<!DOCTYPE html>
       transform: translateY(0);
     }
     @media (max-width: 960px) {
-      .layout {
-        flex-direction: column;
+      .clock-stage {
+        width: min(96vw, 640px);
       }
       .card {
         max-width: 640px;
       }
     }
     @media (max-width: 640px) {
+      .clock-overlay {
+        flex-direction: column;
+        gap: 6px;
+      }
       .output-row {
         flex-direction: column;
       }
@@ -418,32 +417,25 @@ const HTML = `<!DOCTYPE html>
       </p>
     </header>
 
-    <main class="layout">
-      <section class="compass-wrap">
-        <div class="compass-clock">
-          <div class="compass-inner">
-            <span class="compass-mark mark-n">N</span>
-            <span class="compass-mark mark-s">S</span>
-            <span class="compass-mark mark-e">E</span>
-            <span class="compass-mark mark-w">W</span>
-            <div class="hand hour" id="hourHand"></div>
-            <div class="hand minute" id="minuteHand"></div>
-            <div class="hand second" id="secondHand"></div>
-            <div class="compass-center"></div>
-            <div class="clock-readout">
-              <div id="clockTimeText">00:00:00</div>
-              <div id="clockDateText">-</div>
-            </div>
-          </div>
-        </div>
-      </section>
+    <section class="clock-stage">
+      <canvas id="clockCanvas"></canvas>
+      <div class="clock-overlay">
+        <span class="clock-chip" id="cnMonth">--月</span>
+        <span class="clock-chip" id="cnDay">--号</span>
+        <span class="clock-chip" id="cnWeek">星期-</span>
+        <span class="clock-chip" id="cnHour">--点</span>
+        <span class="clock-chip" id="cnMinute">--分</span>
+        <span class="clock-chip" id="cnSecond">--秒</span>
+      </div>
+    </section>
 
-      <section class="card">
+    <main class="layout">
+      <section class="card converter-card">
         <h2>加速链接转换</h2>
         <div class="field">
           <label for="instanceUrl">Xget 实例地址</label>
           <input id="instanceUrl" type="text" value="https://hxorz.cn" />
-          <small>默认走 hxorz.cn，你也可替换为自己的 Worker 域名（Docker 链接/命令会自动切换为 hub.hxorz.cn）。</small>
+          <small>默认走 hxorz.cn，你也可替换为自己的 Worker 域名。Docker 加速推荐将本地 Daemon 改成 hub.hxorz.cn，详见下方说明。</small>
         </div>
 
         <div class="field">
@@ -480,9 +472,44 @@ const HTML = `<!DOCTYPE html>
             <span>GitHub / GitLab / Gitea / Codeberg / Docker Hub / GHCR / Hugging Face / npm / PyPI / conda / Maven / Debian / Ubuntu 等</span>
           </span>
           <span>
-            基于 <a href="https://github.com/xixu-me/Xget" target="_blank" rel="noreferrer">Xget</a> URL 规则 · by hxorz
+            基于 <a href="https://github.com/xixu-me/Xget" target="_blank" rel="noreferrer">Xget</a> URL 规则 · by <a href="https://hxorz.cn" target="_blank" rel="noopener">hxorz</a>
           </span>
         </div>
+      </section>
+
+      <section class="card docker-card">
+        <h2>Docker 换源指南</h2>
+        <p>
+          国内拉取 Docker 镜像的最佳方式是直接把守护进程的镜像源指向 <code>https://hub.hxorz.cn</code>，而不是逐条替换命令。
+          参考 <a href="https://github.com/inwpu/dockerproxy" target="_blank" rel="noopener">dockerproxy 项目</a> 可获得更多代理玩法。
+        </p>
+        <p>编辑 <code>/etc/docker/daemon.json</code>，将配置改为：</p>
+        <pre class="code-block">{
+  "registry-mirrors": ["https://hub.hxorz.cn"]
+}</pre>
+        <p>保存后执行 <code>sudo systemctl daemon-reload</code>、<code>sudo systemctl restart docker</code>，即可让新镜像源生效。</p>
+        <div class="distro-grid">
+          <div class="distro-card">
+            <h4>Ubuntu / Debian</h4>
+            <p>预装 systemd：</p>
+            <code>sudo mkdir -p /etc/docker<br>sudo nano /etc/docker/daemon.json<br>sudo systemctl daemon-reload<br>sudo systemctl restart docker</code>
+          </div>
+          <div class="distro-card">
+            <h4>CentOS / RHEL / Rocky</h4>
+            <p>若使用 firewalld：</p>
+            <code>sudo mkdir -p /etc/docker<br>sudo vim /etc/docker/daemon.json<br>sudo systemctl enable docker --now</code>
+          </div>
+          <div class="distro-card">
+            <h4>Fedora / openSUSE</h4>
+            <p>同样放置 daemon.json，重启 docker 服务或 <code>sudo systemctl restart docker</code>。</p>
+          </div>
+          <div class="distro-card">
+            <h4>Arch / Manjaro</h4>
+            <p>编辑 <code>/etc/docker/daemon.json</code> 后执行：</p>
+            <code>sudo systemctl enable docker --now<br>sudo systemctl restart docker</code>
+          </div>
+        </div>
+        <p>重启完成后，直接运行 <code>docker pull</code> 将自动走 hxorz.cn 的镜像加速，无需额外命令替换。</p>
       </section>
     </main>
   </div>
@@ -641,6 +668,10 @@ const HTML = `<!DOCTYPE html>
       return cmds.join("\\n");
     }
 
+    function pad(n) {
+      return n.toString().padStart(2, "0");
+    }
+
     function convert() {
       const rawInstance = instanceInput.value;
       const rawInput = originalInput.value.trim();
@@ -666,7 +697,7 @@ const HTML = `<!DOCTYPE html>
         }
         const dockerUrl = "https://hub.hxorz.cn/" + ref;
         convertedInput.value = dockerUrl;
-        statusEl.textContent = "已识别 Docker 命令，已切换到 hub.hxorz.cn ✅";
+        statusEl.textContent = "已识别 Docker 命令，已切换到 hub.hxorz.cn ✅（同时建议在下方按指南配置系统级镜像源）";
         statusEl.classList.add("ok");
         const cmdText = buildCommands({ id: "docker", name: "Docker 镜像" }, dockerUrl, dockerCmd.options);
         cmdOutput.value = cmdText;
@@ -701,7 +732,7 @@ const HTML = `<!DOCTYPE html>
       if (platform.id === "docker") {
         effectiveInstance = "https://hub.hxorz.cn";
         result = effectiveInstance + path + query + hash;
-        statusEl.textContent = "已识别平台：Docker 镜像，已自动切换加速域名为 hub.hxorz.cn ✅";
+        statusEl.textContent = "已识别平台：Docker 镜像，已自动切换加速域名为 hub.hxorz.cn ✅（参考下方换源步骤可获得全局加速）";
       } else {
         if (!effectiveInstance) {
           statusEl.textContent = "请先填写 Xget 实例地址，例如：https://hxorz.cn";
@@ -769,41 +800,129 @@ const HTML = `<!DOCTYPE html>
       }
     });
 
-    const hourHand = document.getElementById("hourHand");
-    const minuteHand = document.getElementById("minuteHand");
-    const secondHand = document.getElementById("secondHand");
-    const clockTimeText = document.getElementById("clockTimeText");
-    const clockDateText = document.getElementById("clockDateText");
-    const WEEKDAY = ["日", "一", "二", "三", "四", "五", "六"];
+    const clockCanvas = document.getElementById("clockCanvas");
+    const cnMonthEl = document.getElementById("cnMonth");
+    const cnDayEl = document.getElementById("cnDay");
+    const cnWeekEl = document.getElementById("cnWeek");
+    const cnHourEl = document.getElementById("cnHour");
+    const cnMinuteEl = document.getElementById("cnMinute");
+    const cnSecondEl = document.getElementById("cnSecond");
 
-    function pad(n) {
-      return n.toString().padStart(2, "0");
+    const WEEK_LABELS = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
+    const CN_DIGITS = ["零", "一", "二", "三", "四", "五", "六", "七", "八", "九"];
+
+    function toChineseNumber(num) {
+      if (num === 0) return "零";
+      if (num === 10) return "十";
+      if (num < 10) return CN_DIGITS[num];
+      if (num < 20) return "十" + (num % 10 === 0 ? "" : CN_DIGITS[num % 10]);
+      const tens = Math.floor(num / 10);
+      const units = num % 10;
+      return CN_DIGITS[tens] + "十" + (units ? CN_DIGITS[units] : "");
+    }
+
+    const MONTH_LABELS = Array.from({ length: 12 }, (_, i) => toChineseNumber(i + 1) + "月");
+    const DAY_LABELS = Array.from({ length: 31 }, (_, i) => toChineseNumber(i + 1) + "号");
+    const HOUR_LABELS = Array.from({ length: 24 }, (_, i) => toChineseNumber(i) + "点");
+    const MINUTE_LABELS = Array.from({ length: 60 }, (_, i) => toChineseNumber(i) + "分");
+    const SECOND_LABELS = Array.from({ length: 60 }, (_, i) => toChineseNumber(i) + "秒");
+
+    let clockCtx = null;
+    let lastClockState = null;
+
+    function initClockCanvas() {
+      if (!clockCanvas) return;
+      clockCtx = clockCanvas.getContext("2d");
+      resizeClockCanvas();
+    }
+
+    function resizeClockCanvas() {
+      if (!clockCanvas || !clockCtx) return;
+      const parent = clockCanvas.parentElement;
+      const size = parent ? parent.clientWidth : clockCanvas.clientWidth;
+      const dpr = window.devicePixelRatio || 1;
+      clockCanvas.width = size * dpr;
+      clockCanvas.height = size * dpr;
+      clockCanvas.style.width = size + "px";
+      clockCanvas.style.height = size + "px";
+      clockCtx.setTransform(1, 0, 0, 1, 0, 0);
+      clockCtx.scale(dpr, dpr);
+      if (lastClockState) {
+        drawClockTexture(lastClockState);
+      }
+    }
+
+    function drawClockTexture(state) {
+      if (!clockCtx || !state) return;
+      const size = clockCanvas.clientWidth;
+      const center = size / 2;
+      clockCtx.clearRect(0, 0, size, size);
+      const bg = clockCtx.createRadialGradient(center, center, size * 0.05, center, center, size * 0.5);
+      bg.addColorStop(0, "rgba(14, 165, 233, 0.3)");
+      bg.addColorStop(1, "rgba(2, 6, 23, 0.9)");
+      clockCtx.fillStyle = bg;
+      clockCtx.fillRect(0, 0, size, size);
+
+      const rings = [
+        { labels: MONTH_LABELS, radius: size * 0.18, highlight: state.month },
+        { labels: DAY_LABELS, radius: size * 0.28, highlight: state.day - 1 },
+        { labels: HOUR_LABELS, radius: size * 0.39, highlight: state.hour },
+        { labels: MINUTE_LABELS, radius: size * 0.51, highlight: state.minute },
+        { labels: SECOND_LABELS, radius: size * 0.63, highlight: state.second }
+      ];
+
+      rings.forEach((ring, ringIndex) => {
+        const step = (Math.PI * 2) / ring.labels.length;
+        for (let i = 0; i < ring.labels.length; i++) {
+          const angle = -Math.PI / 2 + i * step;
+          const x = center + Math.cos(angle) * ring.radius;
+          const y = center + Math.sin(angle) * ring.radius;
+          const isActive = i === ring.highlight;
+          clockCtx.save();
+          clockCtx.translate(x, y);
+          clockCtx.rotate(angle + Math.PI / 2);
+          clockCtx.font = (isActive ? "600 " : "400 ") + Math.max(12, size * 0.018) + "px 'Noto Serif SC', 'PingFang SC', serif";
+          clockCtx.fillStyle = isActive
+            ? "rgba(248, 250, 252, 0.95)"
+            : "rgba(148, 163, 184," + (0.15 + ringIndex * 0.12) + ")";
+          clockCtx.textAlign = "center";
+          clockCtx.textBaseline = "middle";
+          clockCtx.fillText(ring.labels[i], 0, 0);
+          if (isActive) {
+            clockCtx.shadowColor = "rgba(6, 182, 212, 0.8)";
+            clockCtx.shadowBlur = 12;
+          }
+          clockCtx.restore();
+        }
+      });
+    }
+
+    function animateChip(el, value) {
+      if (!el || el.textContent === value) return;
+      el.textContent = value;
+      el.classList.remove("pulse");
+      void el.offsetWidth;
+      el.classList.add("pulse");
     }
 
     function updateClock() {
       const now = new Date();
-      const h = now.getHours();
-      const m = now.getMinutes();
-      const s = now.getSeconds();
-      if (hourHand) {
-        const hourDeg = (h % 12) * 30 + m * 0.5;
-        hourHand.style.transform = "translate(-50%, -100%) rotate(" + hourDeg + "deg)";
-      }
-      if (minuteHand) {
-        const minuteDeg = m * 6 + s * 0.1;
-        minuteHand.style.transform = "translate(-50%, -100%) rotate(" + minuteDeg + "deg)";
-      }
-      if (secondHand) {
-        const secondDeg = s * 6;
-        secondHand.style.transform = "translate(-50%, -100%) rotate(" + secondDeg + "deg)";
-      }
-      if (clockTimeText) {
-        clockTimeText.textContent = pad(h) + ":" + pad(m) + ":" + pad(s);
-      }
-      if (clockDateText) {
-        clockDateText.textContent =
-          now.getFullYear() + "-" + pad(now.getMonth() + 1) + "-" + pad(now.getDate()) + " · 星期" + WEEKDAY[now.getDay()];
-      }
+      const state = {
+        month: now.getMonth(),
+        day: now.getDate(),
+        weekday: now.getDay(),
+        hour: now.getHours(),
+        minute: now.getMinutes(),
+        second: now.getSeconds()
+      };
+      lastClockState = state;
+      drawClockTexture(state);
+      animateChip(cnMonthEl, MONTH_LABELS[state.month]);
+      animateChip(cnDayEl, DAY_LABELS[state.day - 1]);
+      animateChip(cnWeekEl, WEEK_LABELS[state.weekday]);
+      animateChip(cnHourEl, HOUR_LABELS[state.hour]);
+      animateChip(cnMinuteEl, MINUTE_LABELS[state.minute]);
+      animateChip(cnSecondEl, SECOND_LABELS[state.second]);
     }
 
     const particleCanvas = document.getElementById("particleCanvas");
@@ -867,6 +986,7 @@ const HTML = `<!DOCTYPE html>
 
     window.addEventListener("resize", () => {
       resizeParticles();
+      resizeClockCanvas();
     });
 
     const infoPanel = document.getElementById("infoPanel");
@@ -918,6 +1038,7 @@ const HTML = `<!DOCTYPE html>
       });
     }
 
+    initClockCanvas();
     convert();
     updateClock();
     initParticles();
