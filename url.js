@@ -17,27 +17,28 @@ const HTML = `<!DOCTYPE html>
   <style>
     :root {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
-      color-scheme: dark;
     }
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
     body {
       margin: 0;
+      padding: 0;
       min-height: 100vh;
-      background: radial-gradient(circle at 20% 20%, #0f172a 0, #020617 55%, #01030e 100%);
-      color: #f8fafc;
+      background: #020617;
+      color: #f9fafb;
       overflow-x: hidden;
     }
-    #particleCanvas {
+
+    /* 粒子动画背景 */
+    #particles-canvas {
       position: fixed;
-      inset: 0;
+      top: 0;
+      left: 0;
       width: 100%;
       height: 100%;
       z-index: 0;
       pointer-events: none;
-      opacity: 0.85;
     }
+
     .page {
       position: relative;
       z-index: 1;
@@ -45,158 +46,152 @@ const HTML = `<!DOCTYPE html>
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      padding: 40px 16px 52px;
+      padding: 20px 16px 36px;
     }
-    .header {
-      text-align: center;
-      margin-bottom: 28px;
-      max-width: 720px;
-    }
-    .brand {
-      font-size: clamp(28px, 5vw, 42px);
-      font-weight: 700;
-      letter-spacing: 0.04em;
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .brand-badge {
-      font-size: 11px;
-      padding: 2px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(125, 211, 252, 0.6);
-      background: rgba(15, 23, 42, 0.85);
-      color: #7dd3fc;
-    }
-    .header-sub {
-      margin-top: 10px;
-      font-size: 14px;
-      color: #cbd5f5;
-      line-height: 1.6;
-    }
-    .layout {
+    .main {
       width: 100%;
       max-width: 1200px;
-      display: flex;
-      flex-direction: column;
+    }
+
+    .header {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .header-title {
+      font-size: 28px;
+      font-weight: 700;
+      display: inline-flex;
       align-items: center;
-      gap: 26px;
+      gap: 8px;
     }
-    .clock-stage {
-      position: relative;
-      width: min(92vw, 900px);
-      margin: 10px auto 32px;
-      aspect-ratio: 1 / 1;
-      border-radius: 50%;
-      overflow: hidden;
-      box-shadow:
-        0 25px 60px rgba(2, 6, 23, 0.85),
-        inset 0 0 60px rgba(59, 130, 246, 0.15);
-      border: 1px solid rgba(148, 163, 184, 0.35);
-      background: radial-gradient(circle, rgba(8, 145, 178, 0.08), rgba(7, 89, 133, 0.08) 35%, rgba(2, 6, 23, 0.96) 70%);
-    }
-    .clock-stage::after {
-      content: "";
-      position: absolute;
-      inset: 8%;
-      border-radius: 50%;
-      border: 1px dashed rgba(148, 163, 184, 0.25);
-      pointer-events: none;
-    }
-    #clockCanvas {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      filter: drop-shadow(0 0 22px rgba(34, 211, 238, 0.35));
-    }
-    .clock-overlay {
-      position: absolute;
-      bottom: 40px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 8px 12px;
-      padding: 14px 24px;
-      background: rgba(15, 23, 42, 0.55);
+    .header-badge {
+      font-size: 11px;
+      padding: 2px 8px;
       border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.4);
-      backdrop-filter: blur(10px);
-    }
-    .clock-chip {
-      font-size: clamp(14px, 2.4vw, 18px);
-      letter-spacing: 0.08em;
-      color: #fdfdfd;
-      text-shadow: 0 0 10px rgba(34, 211, 238, 0.55);
-      transition: transform 0.3s ease, color 0.3s ease;
-    }
-    .clock-chip.pulse {
-      animation: glowPulse 0.8s ease;
-    }
-    @keyframes glowPulse {
-      0% { transform: scale(1); color: #e0f2fe; text-shadow: 0 0 8px rgba(125, 211, 252, 0.6); }
-      40% { transform: scale(1.12); color: #f9fafb; text-shadow: 0 0 25px rgba(6, 182, 212, 0.95); }
-      100% { transform: scale(1); color: #fdfdfd; }
-    }
-    .card {
-      flex: 1 1 360px;
-      width: 100%;
-      max-width: 520px;
-      background: rgba(8, 15, 40, 0.86);
-      border-radius: 26px;
-      padding: 26px 22px;
-      border: 1px solid rgba(148, 163, 184, 0.35);
-      box-shadow:
-        0 25px 50px rgba(2, 6, 23, 0.65),
-        inset 0 1px 0 rgba(148, 163, 184, 0.2);
-      backdrop-filter: blur(18px);
-    }
-    .card h2 {
-      margin: 0 0 12px;
-      font-size: 20px;
-    }
-    .docker-card {
-      max-width: 900px;
-    }
-    .code-block {
-      background: rgba(15, 23, 42, 0.92);
-      border-radius: 12px;
-      border: 1px solid rgba(148, 163, 184, 0.35);
-      padding: 12px 14px;
-      font-family: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
-      font-size: 13px;
-      line-height: 1.5;
-      overflow: auto;
-      margin: 8px 0 14px;
-    }
-    .distro-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 16px;
-      margin-top: 12px;
-    }
-    .distro-card {
-      background: rgba(15, 23, 42, 0.7);
-      border-radius: 14px;
-      border: 1px solid rgba(148, 163, 184, 0.2);
-      padding: 12px;
-    }
-    .distro-card h4 {
-      margin: 0 0 6px;
-      font-size: 14px;
+      border: 1px solid rgba(56, 189, 248, 0.7);
       color: #7dd3fc;
+      background: rgba(15, 23, 42, 0.9);
     }
-    .distro-card code {
-      font-family: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+    .header-sub {
+      margin-top: 6px;
+      font-size: 13px;
+      color: #9ca3af;
+      max-width: 640px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* 罗盘时钟容器 */
+    .compass-clock-section {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 30px;
+      padding: 20px;
+    }
+
+    .compass-clock {
+      position: relative;
+      width: min(90vw, 700px);
+      height: min(90vw, 700px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .clock-ring {
+      position: absolute;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .clock-item {
+      position: absolute;
       font-size: 12px;
-      color: #f8fafc;
+      color: rgba(255, 255, 255, 0.4);
+      transform-origin: center;
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      white-space: nowrap;
     }
+
+    .clock-item.active {
+      color: #22c55e;
+      font-weight: 700;
+      text-shadow: 0 0 20px rgba(34, 197, 94, 0.8), 0 0 40px rgba(34, 197, 94, 0.4);
+      transform: scale(1.3);
+    }
+
+    .clock-item.rotating {
+      animation: itemRotate 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes itemRotate {
+      0% { transform: scale(1) rotate(0deg); }
+      25% { transform: scale(1.5) rotate(90deg); }
+      50% { transform: scale(1.2) rotate(180deg); }
+      75% { transform: scale(1.4) rotate(270deg); }
+      100% { transform: scale(1.3) rotate(360deg); }
+    }
+
+    /* 中心信息显示 */
+    .clock-center {
+      position: absolute;
+      text-align: center;
+      z-index: 10;
+    }
+
+    .clock-center-text {
+      font-size: 16px;
+      color: #e5e7eb;
+      line-height: 1.8;
+    }
+
+    .clock-center-text span {
+      display: inline-block;
+      margin: 0 8px;
+      padding: 4px 12px;
+      background: rgba(34, 197, 94, 0.2);
+      border-radius: 8px;
+      border: 1px solid rgba(34, 197, 94, 0.5);
+    }
+
+    /* 粒子爆炸效果 */
+    .burst-particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      pointer-events: none;
+      animation: burst 0.8s ease-out forwards;
+    }
+
+    @keyframes burst {
+      0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+      }
+      100% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 0;
+      }
+    }
+
+    /* URL 转换卡片 */
+    .card {
+      width: 100%;
+      background: rgba(15, 23, 42, 0.96);
+      border-radius: 20px;
+      padding: 20px 20px 18px;
+      box-shadow: 0 20px 40px rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      backdrop-filter: blur(14px);
+      margin-bottom: 20px;
+    }
+
     .field {
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
     .field label {
       display: block;
@@ -207,44 +202,42 @@ const HTML = `<!DOCTYPE html>
     .field small {
       display: block;
       font-size: 11px;
-      color: #94a3b8;
-      margin-top: 4px;
-      line-height: 1.4;
+      color: #9ca3af;
+      margin-top: 2px;
     }
-    input,
-    textarea {
+    input, textarea {
       width: 100%;
-      border-radius: 12px;
-      border: 1px solid rgba(148, 163, 184, 0.45);
-      background: rgba(15, 23, 42, 0.92);
-      color: #e2e8f0;
-      padding: 11px 13px;
-      font-size: 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      background: rgba(15, 23, 42, 0.9);
+      color: #e5e7eb;
+      padding: 9px 11px;
+      font-size: 13px;
       outline: none;
-      transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+      transition: border-color 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
     }
-    input:focus,
-    textarea:focus {
+    input:focus, textarea:focus {
       border-color: #38bdf8;
-      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.45);
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.4);
       background: rgba(15, 23, 42, 0.95);
     }
     textarea {
-      min-height: 68px;
+      min-height: 64px;
       resize: vertical;
     }
+
     .output-row {
       display: flex;
-      gap: 10px;
+      gap: 8px;
       align-items: stretch;
     }
     .output-row textarea {
       flex: 1;
-      min-height: 68px;
     }
+
     .btn {
-      border-radius: 12px;
-      padding: 0 18px;
+      border-radius: 10px;
+      padding: 0 16px;
       font-size: 13px;
       border: none;
       cursor: pointer;
@@ -253,39 +246,41 @@ const HTML = `<!DOCTYPE html>
       align-items: center;
       justify-content: center;
       gap: 4px;
-      background: linear-gradient(135deg, #22d3ee, #14b8a6);
-      color: #f8fafc;
+      background: linear-gradient(135deg, #22c55e, #06b6d4);
+      color: #f9fafb;
       font-weight: 600;
-      transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+      transition: transform 0.1s ease, box-shadow 0.1s ease, filter 0.1s ease;
     }
     .btn:hover {
       filter: brightness(1.05);
-      box-shadow: 0 15px 32px rgba(13, 148, 136, 0.35);
+      box-shadow: 0 10px 18px rgba(34, 197, 94, 0.35);
       transform: translateY(-1px);
     }
     .btn:active {
+      box-shadow: 0 4px 10px rgba(34, 197, 94, 0.3);
       transform: translateY(0);
-      box-shadow: 0 6px 18px rgba(13, 148, 136, 0.4);
     }
+
     .status {
-      margin-top: 8px;
+      margin-top: 6px;
       font-size: 12px;
-      min-height: 18px;
+      min-height: 16px;
     }
     .status.ok {
-      color: #34d399;
+      color: #4ade80;
     }
     .status.err {
-      color: #fb7185;
+      color: #f97373;
     }
+
     .footer {
-      margin-top: 18px;
+      margin-top: 16px;
       font-size: 11px;
-      color: #a5b4fc;
+      color: #9ca3af;
       display: flex;
       flex-wrap: wrap;
       justify-content: space-between;
-      gap: 6px;
+      gap: 4px;
     }
     .footer a {
       color: #7dd3fc;
@@ -296,32 +291,142 @@ const HTML = `<!DOCTYPE html>
     }
     .pill {
       border-radius: 999px;
-      padding: 2px 10px;
-      background: rgba(15, 23, 42, 0.85);
+      padding: 2px 8px;
+      background: rgba(15, 23, 42, 0.9);
       border: 1px solid rgba(148, 163, 184, 0.4);
-      backdrop-filter: blur(12px);
     }
     .pill strong {
       color: #e5e7eb;
     }
     .pill span {
-      color: #94a3b8;
+      color: #9ca3af;
       margin-left: 4px;
     }
+
+    /* Docker 换源说明卡片 */
+    .docker-card {
+      width: 100%;
+      background: rgba(15, 23, 42, 0.96);
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 20px 40px rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      backdrop-filter: blur(14px);
+      margin-bottom: 20px;
+    }
+
+    .docker-card h3 {
+      margin: 0 0 12px 0;
+      font-size: 16px;
+      color: #e5e7eb;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .docker-card h3 .badge {
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #22c55e, #06b6d4);
+      color: #fff;
+    }
+
+    .docker-card p {
+      margin: 0 0 12px 0;
+      font-size: 13px;
+      color: #9ca3af;
+      line-height: 1.6;
+    }
+
+    .docker-card a {
+      color: #7dd3fc;
+      text-decoration: none;
+    }
+    .docker-card a:hover {
+      text-decoration: underline;
+    }
+
+    .code-block {
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 8px;
+      padding: 12px;
+      font-family: 'Monaco', 'Menlo', monospace;
+      font-size: 12px;
+      color: #e5e7eb;
+      overflow-x: auto;
+      margin: 10px 0;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+    }
+
+    .code-block pre {
+      margin: 0;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .distro-section {
+      margin-top: 16px;
+    }
+
+    .distro-section h4 {
+      margin: 0 0 10px 0;
+      font-size: 14px;
+      color: #e5e7eb;
+    }
+
+    .distro-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .distro-tab {
+      padding: 6px 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      background: rgba(15, 23, 42, 0.9);
+      color: #9ca3af;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .distro-tab:hover {
+      border-color: #38bdf8;
+      color: #e5e7eb;
+    }
+
+    .distro-tab.active {
+      background: linear-gradient(135deg, #22c55e, #06b6d4);
+      color: #fff;
+      border-color: transparent;
+    }
+
+    .distro-content {
+      display: none;
+    }
+
+    .distro-content.active {
+      display: block;
+    }
+
+    /* 悬浮访问信息窗 */
     .info-panel {
       position: fixed;
       right: 18px;
-      bottom: 22px;
+      bottom: 20px;
       width: 260px;
       max-width: calc(100% - 32px);
-      background: rgba(15, 23, 42, 0.9);
-      border-radius: 18px;
-      border: 1px solid rgba(148, 163, 184, 0.45);
-      box-shadow: 0 18px 40px rgba(2, 6, 23, 0.75);
-      padding: 12px 14px;
+      background: rgba(31, 41, 55, 0.96);
+      border-radius: 16px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.96);
+      padding: 10px 12px;
       font-size: 11px;
       color: #e5e7eb;
-      z-index: 2;
+      z-index: 40;
       transition: opacity 0.3s ease, transform 0.3s ease;
     }
     .info-panel.hidden {
@@ -350,102 +455,94 @@ const HTML = `<!DOCTYPE html>
       line-height: 1.4;
     }
     .info-key {
-      opacity: 0.7;
+      opacity: 0.75;
       margin-right: 4px;
     }
     .info-toggle {
       position: fixed;
       right: 18px;
-      bottom: 20px;
+      bottom: 18px;
       border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.6);
+      border: 1px solid rgba(148, 163, 184, 0.7);
       background: rgba(15, 23, 42, 0.95);
-      padding: 6px 12px;
       color: #e5e7eb;
       font-size: 11px;
+      padding: 6px 12px;
       cursor: pointer;
       box-shadow: 0 8px 18px rgba(15, 23, 42, 0.85);
-      z-index: 2;
-      opacity: 0;
-      transform: translateY(12px);
-      transition: opacity 0.3s ease, transform 0.3s ease;
+      z-index: 30;
+      display: none;
     }
     .info-toggle.visible {
-      opacity: 1;
-      transform: translateY(0);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
     }
-    @media (max-width: 960px) {
-      .clock-stage {
-        width: min(96vw, 640px);
-      }
-      .card {
-        max-width: 640px;
-      }
-    }
+
     @media (max-width: 640px) {
-      .clock-overlay {
-        flex-direction: column;
-        gap: 6px;
+      .card, .docker-card {
+        padding: 16px 14px 14px;
+      }
+      .compass-clock {
+        width: 95vw;
+        height: 95vw;
+      }
+      .clock-item {
+        font-size: 10px;
+      }
+      .clock-center-text {
+        font-size: 12px;
       }
       .output-row {
         flex-direction: column;
       }
-      .info-panel {
-        left: 12px;
-        right: 12px;
-        width: auto;
-      }
-      .info-toggle {
-        left: 12px;
-        right: 12px;
-        text-align: center;
+      .btn {
+        justify-content: center;
       }
     }
   </style>
 </head>
 <body>
-  <canvas id="particleCanvas"></canvas>
+  <canvas id="particles-canvas"></canvas>
+
   <div class="page">
-    <header class="header">
-      <div class="brand">
-        hxorz URL 转换器
-        <span class="brand-badge">国内加速</span>
-      </div>
-      <p class="header-sub">
-        将 GitHub / GitLab / Docker Hub / GHCR / Hugging Face 等原始链接一键转到 hxorz 加速域名，现已支持直接粘贴
-        <code>docker pull</code> 命令。
-      </p>
-    </header>
+    <main class="main">
+      <header class="header">
+        <div class="header-title">
+          Xget URL 转换器
+          <span class="header-badge">hxorz.cn 实例</span>
+        </div>
+        <div class="header-sub">
+          将 GitHub / GitLab / Hugging Face / npm / PyPI 等平台的原始链接，一键转换为通过
+          <code>hxorz.cn</code> 的 Xget 加速链接。
+        </div>
+      </header>
 
-    <section class="clock-stage">
-      <canvas id="clockCanvas"></canvas>
-      <div class="clock-overlay">
-        <span class="clock-chip" id="cnMonth">--月</span>
-        <span class="clock-chip" id="cnDay">--号</span>
-        <span class="clock-chip" id="cnWeek">星期-</span>
-        <span class="clock-chip" id="cnHour">--点</span>
-        <span class="clock-chip" id="cnMinute">--分</span>
-        <span class="clock-chip" id="cnSecond">--秒</span>
-      </div>
-    </section>
+      <!-- 罗盘时钟 -->
+      <section class="compass-clock-section">
+        <div class="compass-clock" id="compassClock">
+          <div class="clock-center">
+            <div class="clock-center-text" id="clockCenterText"></div>
+          </div>
+        </div>
+      </section>
 
-    <main class="layout">
-      <section class="card converter-card">
-        <h2>加速链接转换</h2>
+      <!-- URL 转换主体卡片 -->
+      <section class="card">
         <div class="field">
           <label for="instanceUrl">Xget 实例地址</label>
           <input id="instanceUrl" type="text" value="https://hxorz.cn" />
-          <small>默认走 hxorz.cn，你也可替换为自己的 Worker 域名。Docker 加速推荐将本地 Daemon 改成 hub.hxorz.cn，详见下方说明。</small>
+          <small>例如：<code>https://hxorz.cn</code>，可替换为你自己的 Xget Worker 域名（Docker 链接会自动切换到 hub.hxorz.cn）。</small>
         </div>
 
         <div class="field">
-          <label for="originalUrl">原始 URL / docker 命令</label>
-          <textarea id="originalUrl" placeholder="粘贴 GitHub / Docker Hub / GHCR / Hugging Face / npm / PyPI 等链接，或直接粘贴 docker pull 命令"></textarea>
-          <small>平台自动识别生成加速 URL，docker 命令会被解析成 hub.hxorz.cn/镜像。</small>
+          <label for="originalUrl">原始 URL</label>
+          <textarea id="originalUrl" placeholder="粘贴 GitHub / Docker Hub / GHCR / Hugging Face / npm / PyPI 等原始链接"></textarea>
+          <small>平台将自动识别并生成加速 URL。</small>
         </div>
 
         <div class="field">
-          <label for="convertedUrl">转换后的加速链接</label>
+          <label for="convertedUrl">转换后的 Xget URL</label>
           <div class="output-row">
             <textarea id="convertedUrl" readonly placeholder="转换结果会显示在这里"></textarea>
             <button id="copyBtn" class="btn" type="button">
@@ -477,44 +574,134 @@ const HTML = `<!DOCTYPE html>
         </div>
       </section>
 
-      <section class="card docker-card">
-        <h2>Docker 换源指南</h2>
+      <!-- Docker 换源说明 -->
+      <section class="docker-card">
+        <h3>
+          Docker 镜像加速配置
+          <span class="badge">推荐</span>
+        </h3>
         <p>
-          国内拉取 Docker 镜像的最佳方式是直接把守护进程的镜像源指向 <code>https://hub.hxorz.cn</code>，而不是逐条替换命令。
-          参考 <a href="https://github.com/inwpu/dockerproxy" target="_blank" rel="noopener">dockerproxy 项目</a> 可获得更多代理玩法。
+          将您的 Docker 源改为以下配置，即可使用 hxorz.cn 提供的 Docker 镜像加速服务。修改后需要重启 Docker 服务才能生效。
         </p>
-        <p>编辑 <code>/etc/docker/daemon.json</code>，将配置改为：</p>
-        <pre class="code-block">{
+        <p>
+          项目地址：<a href="https://github.com/inwpu/dockerproxy" target="_blank" rel="noreferrer">https://github.com/inwpu/dockerproxy</a>
+        </p>
+
+        <div class="code-block">
+          <pre>{
   "registry-mirrors": ["https://hub.hxorz.cn"]
 }</pre>
-        <p>保存后执行 <code>sudo systemctl daemon-reload</code>、<code>sudo systemctl restart docker</code>，即可让新镜像源生效。</p>
-        <div class="distro-grid">
-          <div class="distro-card">
-            <h4>Ubuntu / Debian</h4>
-            <p>预装 systemd：</p>
-            <code>sudo mkdir -p /etc/docker<br>sudo nano /etc/docker/daemon.json<br>sudo systemctl daemon-reload<br>sudo systemctl restart docker</code>
+        </div>
+
+        <div class="distro-section">
+          <h4>常见 Linux 发行版配置方法</h4>
+          <div class="distro-tabs">
+            <button class="distro-tab active" data-distro="ubuntu">Ubuntu/Debian</button>
+            <button class="distro-tab" data-distro="centos">CentOS/RHEL</button>
+            <button class="distro-tab" data-distro="arch">Arch Linux</button>
+            <button class="distro-tab" data-distro="fedora">Fedora</button>
+            <button class="distro-tab" data-distro="opensuse">openSUSE</button>
           </div>
-          <div class="distro-card">
-            <h4>CentOS / RHEL / Rocky</h4>
-            <p>若使用 firewalld：</p>
-            <code>sudo mkdir -p /etc/docker<br>sudo vim /etc/docker/daemon.json<br>sudo systemctl enable docker --now</code>
+
+          <div class="distro-content active" data-distro="ubuntu">
+            <div class="code-block">
+              <pre># 1. 编辑或创建 Docker 配置文件
+sudo mkdir -p /etc/docker
+sudo tee /etc/docker/daemon.json &lt;&lt;EOF
+{
+  "registry-mirrors": ["https://hub.hxorz.cn"]
+}
+EOF
+
+# 2. 重启 Docker 服务
+sudo systemctl daemon-reload
+sudo systemctl restart docker
+
+# 3. 验证配置是否生效
+docker info | grep -A 5 "Registry Mirrors"</pre>
+            </div>
           </div>
-          <div class="distro-card">
-            <h4>Fedora / openSUSE</h4>
-            <p>同样放置 daemon.json，重启 docker 服务或 <code>sudo systemctl restart docker</code>。</p>
+
+          <div class="distro-content" data-distro="centos">
+            <div class="code-block">
+              <pre># 1. 编辑或创建 Docker 配置文件
+sudo mkdir -p /etc/docker
+sudo tee /etc/docker/daemon.json &lt;&lt;EOF
+{
+  "registry-mirrors": ["https://hub.hxorz.cn"]
+}
+EOF
+
+# 2. 重启 Docker 服务
+sudo systemctl daemon-reload
+sudo systemctl restart docker
+
+# 3. 验证配置是否生效
+docker info | grep -A 5 "Registry Mirrors"</pre>
+            </div>
           </div>
-          <div class="distro-card">
-            <h4>Arch / Manjaro</h4>
-            <p>编辑 <code>/etc/docker/daemon.json</code> 后执行：</p>
-            <code>sudo systemctl enable docker --now<br>sudo systemctl restart docker</code>
+
+          <div class="distro-content" data-distro="arch">
+            <div class="code-block">
+              <pre># 1. 编辑或创建 Docker 配置文件
+sudo mkdir -p /etc/docker
+sudo tee /etc/docker/daemon.json &lt;&lt;EOF
+{
+  "registry-mirrors": ["https://hub.hxorz.cn"]
+}
+EOF
+
+# 2. 重启 Docker 服务
+sudo systemctl daemon-reload
+sudo systemctl restart docker
+
+# 3. 验证配置是否生效
+docker info | grep -A 5 "Registry Mirrors"</pre>
+            </div>
+          </div>
+
+          <div class="distro-content" data-distro="fedora">
+            <div class="code-block">
+              <pre># 1. 编辑或创建 Docker 配置文件
+sudo mkdir -p /etc/docker
+sudo tee /etc/docker/daemon.json &lt;&lt;EOF
+{
+  "registry-mirrors": ["https://hub.hxorz.cn"]
+}
+EOF
+
+# 2. 重启 Docker 服务
+sudo systemctl daemon-reload
+sudo systemctl restart docker
+
+# 3. 验证配置是否生效
+docker info | grep -A 5 "Registry Mirrors"</pre>
+            </div>
+          </div>
+
+          <div class="distro-content" data-distro="opensuse">
+            <div class="code-block">
+              <pre># 1. 编辑或创建 Docker 配置文件
+sudo mkdir -p /etc/docker
+sudo tee /etc/docker/daemon.json &lt;&lt;EOF
+{
+  "registry-mirrors": ["https://hub.hxorz.cn"]
+}
+EOF
+
+# 2. 重启 Docker 服务
+sudo systemctl restart docker
+
+# 3. 验证配置是否生效
+docker info | grep -A 5 "Registry Mirrors"</pre>
+            </div>
           </div>
         </div>
-        <p>重启完成后，直接运行 <code>docker pull</code> 将自动走 hxorz.cn 的镜像加速，无需额外命令替换。</p>
       </section>
     </main>
   </div>
 
-  <!-- 悬浮访问信息窗（不存储，只展示当前信息 + busuanzi 统计） -->
+  <!-- 悬浮访问信息窗 -->
   <div class="info-panel" id="infoPanel">
     <div class="info-title">
       <span>访问信息</span>
@@ -533,6 +720,98 @@ const HTML = `<!DOCTYPE html>
   <button class="info-toggle" id="infoToggle">访问信息</button>
 
   <script>
+    // === 粒子动画背景 ===
+    const canvas = document.getElementById('particles-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    let animationId;
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    class Particle {
+      constructor() {
+        this.reset();
+      }
+
+      reset() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.size = Math.random() * 2 + 0.5;
+        this.speedX = (Math.random() - 0.5) * 0.5;
+        this.speedY = (Math.random() - 0.5) * 0.5;
+        this.opacity = Math.random() * 0.5 + 0.2;
+        this.hue = Math.random() * 60 + 120; // 绿色到青色
+      }
+
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+
+        if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+        if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+      }
+
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fillStyle = \`hsla(\${this.hue}, 70%, 60%, \${this.opacity})\`;
+        ctx.fill();
+      }
+    }
+
+    function initParticles() {
+      particles = [];
+      const count = Math.min(150, Math.floor((canvas.width * canvas.height) / 10000));
+      for (let i = 0; i < count; i++) {
+        particles.push(new Particle());
+      }
+    }
+
+    function connectParticles() {
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist < 100) {
+            const opacity = (1 - dist / 100) * 0.15;
+            ctx.beginPath();
+            ctx.strokeStyle = \`rgba(34, 197, 94, \${opacity})\`;
+            ctx.lineWidth = 0.5;
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.stroke();
+          }
+        }
+      }
+    }
+
+    function animateParticles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      for (const particle of particles) {
+        particle.update();
+        particle.draw();
+      }
+
+      connectParticles();
+      animationId = requestAnimationFrame(animateParticles);
+    }
+
+    resizeCanvas();
+    initParticles();
+    animateParticles();
+
+    window.addEventListener('resize', () => {
+      resizeCanvas();
+      initParticles();
+    });
+
+    // === 平台规则 ===
     const PLATFORMS = [
       { id: "docker",  name: "Docker 镜像",      prefix: "",       match: ["docker.io", "registry-1.docker.io", "ghcr.io", "quay.io"] },
       { id: "github",  name: "GitHub",          prefix: "gh",     match: ["github.com"] },
@@ -603,60 +882,13 @@ const HTML = `<!DOCTYPE html>
       return null;
     }
 
-    function parseDockerPullCommand(text) {
-      if (!text) return null;
-      const lower = text.toLowerCase();
-      const idx = lower.indexOf("docker pull");
-      if (idx === -1) return null;
-      const after = text.slice(idx + "docker pull".length).trim();
-      if (!after) return null;
-      const tokens = after.split(/\\s+/);
-      const options = [];
-      let image = "";
-      for (let i = 0; i < tokens.length; i++) {
-        let token = tokens[i];
-        if (!token) continue;
-        if (!image && token.startsWith("-")) {
-          options.push(token);
-          if (
-            token.startsWith("--") &&
-            !token.includes("=") &&
-            tokens[i + 1] &&
-            !tokens[i + 1].startsWith("-")
-          ) {
-            options.push(tokens[i + 1]);
-            i++;
-          }
-          continue;
-        }
-        if (!image) {
-          image = token.replace(/^['"]|['"]$/g, "");
-          break;
-        }
-      }
-      if (!image) return null;
-      return { image, options };
-    }
-
-    function normalizeDockerReference(ref) {
-      if (!ref) return "";
-      let value = ref.trim();
-      value = value.replace(/^https?:\\/\\//i, "");
-      value = value.replace(/^registry-1\\.docker\\.io\\//i, "");
-      value = value.replace(/^docker\\.io\\//i, "");
-      value = value.replace(/^hub\\.docker\\.com\\/r\\//i, "");
-      value = value.replace(/^library\\//i, "library/");
-      return value.replace(/^\\/+/, "");
-    }
-
-    function buildCommands(platform, url, dockerOptions = []) {
+    function buildCommands(platform, url) {
       if (!platform || !url) return "";
       const cmds = [];
       if (platform.id === "docker") {
         const noScheme = url.replace(/^https?:\\/\\//i, "");
-        const optionText = dockerOptions.length ? dockerOptions.join(" ") + " " : "";
-        cmds.push("# Docker 拉取镜像（如有登录需求请自行补充 docker login）");
-        cmds.push("docker pull " + optionText + noScheme);
+        cmds.push("# Docker 拉取镜像（如有私有仓库登录等，请自行补充）");
+        cmds.push("docker pull " + noScheme);
       } else if (["github","gist","gitlab","gitea","codeberg","sf","aosp","homebrew"].includes(platform.id)) {
         cmds.push("# Git 克隆仓库");
         cmds.push("git clone " + url);
@@ -668,46 +900,23 @@ const HTML = `<!DOCTYPE html>
       return cmds.join("\\n");
     }
 
-    function pad(n) {
-      return n.toString().padStart(2, "0");
-    }
-
     function convert() {
       const rawInstance = instanceInput.value;
-      const rawInput = originalInput.value.trim();
+      const rawUrl = originalInput.value.trim();
 
       statusEl.textContent = "";
       statusEl.className = "status";
       cmdOutput.value = "";
       cmdHint.textContent = "";
 
-      if (!rawInput) {
+      if (!rawUrl) {
         convertedInput.value = "";
         return;
       }
 
-      const dockerCmd = parseDockerPullCommand(rawInput);
-      if (dockerCmd) {
-        const ref = normalizeDockerReference(dockerCmd.image);
-        if (!ref) {
-          statusEl.textContent = "未能解析 docker pull 命令，请检查镜像名称。";
-          statusEl.classList.add("err");
-          convertedInput.value = "";
-          return;
-        }
-        const dockerUrl = "https://hub.hxorz.cn/" + ref;
-        convertedInput.value = dockerUrl;
-        statusEl.textContent = "已识别 Docker 命令，已切换到 hub.hxorz.cn ✅（同时建议在下方按指南配置系统级镜像源）";
-        statusEl.classList.add("ok");
-        const cmdText = buildCommands({ id: "docker", name: "Docker 镜像" }, dockerUrl, dockerCmd.options);
-        cmdOutput.value = cmdText;
-        cmdHint.textContent = "Docker 命令已自动替换为 hxorz 加速镜像，可直接复制执行。";
-        return;
-      }
-
-      let parsedUrl;
+      let u;
       try {
-        parsedUrl = new URL(rawInput);
+        u = new URL(rawUrl);
       } catch (e) {
         statusEl.textContent = "原始 URL 无法解析，请检查是否粘贴完整。";
         statusEl.classList.add("err");
@@ -715,7 +924,7 @@ const HTML = `<!DOCTYPE html>
         return;
       }
 
-      let platform = detectPlatform(parsedUrl, rawInput);
+      let platform = detectPlatform(u, rawUrl);
       if (!platform) {
         statusEl.textContent = "暂未识别到支持的平台（GitHub / Docker Hub / Hugging Face / npm / PyPI 等）。";
         statusEl.classList.add("err");
@@ -725,14 +934,14 @@ const HTML = `<!DOCTYPE html>
 
       let effectiveInstance = normalizeInstanceUrl(rawInstance);
       let result = "";
-      const path = parsedUrl.pathname || "/";
-      const query = parsedUrl.search || "";
-      const hash = parsedUrl.hash || "";
+      const path = u.pathname || "/";
+      const query = u.search || "";
+      const hash = u.hash || "";
 
       if (platform.id === "docker") {
         effectiveInstance = "https://hub.hxorz.cn";
         result = effectiveInstance + path + query + hash;
-        statusEl.textContent = "已识别平台：Docker 镜像，已自动切换加速域名为 hub.hxorz.cn ✅（参考下方换源步骤可获得全局加速）";
+        statusEl.textContent = "已识别平台：Docker 镜像，已自动切换加速域名为 hub.hxorz.cn ✅";
       } else {
         if (!effectiveInstance) {
           statusEl.textContent = "请先填写 Xget 实例地址，例如：https://hxorz.cn";
@@ -740,27 +949,29 @@ const HTML = `<!DOCTYPE html>
           convertedInput.value = "";
           return;
         }
-        const prefix = platform.prefix ? "/" + platform.prefix : "";
-        result = effectiveInstance + prefix + path + query + hash;
+        result = effectiveInstance + "/" + platform.prefix + path + query + hash;
         statusEl.textContent = "已识别平台：" + platform.name + "，转换成功 ✅";
       }
 
       convertedInput.value = result;
       statusEl.classList.add("ok");
+
       const cmdText = buildCommands(platform, result);
       cmdOutput.value = cmdText;
       if (cmdText) {
-        cmdHint.textContent = "已为 " + platform.name + " 生成推荐命令，可直接复制后按需修改。";
+        cmdHint.textContent = "已为 " + platform.name + " 生成推荐命令，可直接复制到终端执行（按需修改）。";
       }
     }
 
-    function debounceConvert() {
+    originalInput.addEventListener("input", () => {
       clearTimeout(window.__xgetTimer);
       window.__xgetTimer = setTimeout(convert, 120);
-    }
+    });
 
-    originalInput.addEventListener("input", debounceConvert);
-    instanceInput.addEventListener("input", debounceConvert);
+    instanceInput.addEventListener("input", () => {
+      clearTimeout(window.__xgetTimer);
+      window.__xgetTimer = setTimeout(convert, 120);
+    });
 
     copyBtn.addEventListener("click", async () => {
       const text = convertedInput.value.trim();
@@ -800,222 +1011,207 @@ const HTML = `<!DOCTYPE html>
       }
     });
 
-    const clockCanvas = document.getElementById("clockCanvas");
-    const cnMonthEl = document.getElementById("cnMonth");
-    const cnDayEl = document.getElementById("cnDay");
-    const cnWeekEl = document.getElementById("cnWeek");
-    const cnHourEl = document.getElementById("cnHour");
-    const cnMinuteEl = document.getElementById("cnMinute");
-    const cnSecondEl = document.getElementById("cnSecond");
+    // === 罗盘时钟 ===
+    const compassClock = document.getElementById('compassClock');
+    const clockCenterText = document.getElementById('clockCenterText');
 
-    const WEEK_LABELS = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
-    const CN_DIGITS = ["零", "一", "二", "三", "四", "五", "六", "七", "八", "九"];
-
-    function toChineseNumber(num) {
-      if (num === 0) return "零";
-      if (num === 10) return "十";
-      if (num < 10) return CN_DIGITS[num];
-      if (num < 20) return "十" + (num % 10 === 0 ? "" : CN_DIGITS[num % 10]);
-      const tens = Math.floor(num / 10);
-      const units = num % 10;
-      return CN_DIGITS[tens] + "十" + (units ? CN_DIGITS[units] : "");
+    // 中文数字
+    const chineseMonths = ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'];
+    const chineseDays = [];
+    for (let i = 1; i <= 31; i++) {
+      if (i <= 10) chineseDays.push(['一', '二', '三', '四', '五', '六', '七', '八', '九', '十'][i-1] + '号');
+      else if (i < 20) chineseDays.push('十' + ['一', '二', '三', '四', '五', '六', '七', '八', '九'][i-11] + '号');
+      else if (i === 20) chineseDays.push('二十号');
+      else if (i < 30) chineseDays.push('二十' + ['一', '二', '三', '四', '五', '六', '七', '八', '九'][i-21] + '号');
+      else if (i === 30) chineseDays.push('三十号');
+      else chineseDays.push('三十一号');
+    }
+    const chineseWeekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+    const chineseHours = [];
+    for (let i = 0; i < 24; i++) {
+      if (i === 0) chineseHours.push('零点');
+      else if (i <= 10) chineseHours.push(['一', '二', '三', '四', '五', '六', '七', '八', '九', '十'][i-1] + '点');
+      else if (i < 20) chineseHours.push('十' + (i === 10 ? '' : ['一', '二', '三', '四', '五', '六', '七', '八', '九'][i-11]) + '点');
+      else if (i === 20) chineseHours.push('二十点');
+      else chineseHours.push('二十' + ['一', '二', '三'][i-21] + '点');
+    }
+    const chineseMinutes = [];
+    const chineseSeconds = [];
+    for (let i = 0; i < 60; i++) {
+      let str = '';
+      if (i === 0) str = '零';
+      else if (i <= 10) str = ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十'][i-1];
+      else if (i < 20) str = '十' + ['一', '二', '三', '四', '五', '六', '七', '八', '九'][i-11];
+      else if (i % 10 === 0) str = ['二十', '三十', '四十', '五十'][i/10-2];
+      else str = ['二十', '三十', '四十', '五十'][Math.floor(i/10)-2] + ['一', '二', '三', '四', '五', '六', '七', '八', '九'][i%10-1];
+      chineseMinutes.push(str + '分');
+      chineseSeconds.push(str + '秒');
     }
 
-    const MONTH_LABELS = Array.from({ length: 12 }, (_, i) => toChineseNumber(i + 1) + "月");
-    const DAY_LABELS = Array.from({ length: 31 }, (_, i) => toChineseNumber(i + 1) + "号");
-    const HOUR_LABELS = Array.from({ length: 24 }, (_, i) => toChineseNumber(i) + "点");
-    const MINUTE_LABELS = Array.from({ length: 60 }, (_, i) => toChineseNumber(i) + "分");
-    const SECOND_LABELS = Array.from({ length: 60 }, (_, i) => toChineseNumber(i) + "秒");
+    // 环配置
+    const rings = [
+      { id: 'month', items: chineseMonths, radius: 0.95 },
+      { id: 'day', items: chineseDays, radius: 0.82 },
+      { id: 'weekday', items: chineseWeekdays, radius: 0.69 },
+      { id: 'hour', items: chineseHours, radius: 0.56 },
+      { id: 'minute', items: chineseMinutes, radius: 0.43 },
+      { id: 'second', items: chineseSeconds, radius: 0.30 }
+    ];
 
-    let clockCtx = null;
-    let lastClockState = null;
-    let clockRotation = 0;
-    let clockFrameTime = 0;
-    let clockAnimHandle = null;
+    let clockElements = {};
+    let lastValues = {};
 
-    function initClockCanvas() {
-      if (!clockCanvas) return;
-      clockCtx = clockCanvas.getContext("2d");
-      resizeClockCanvas();
-    }
-
-    function resizeClockCanvas() {
-      if (!clockCanvas || !clockCtx) return;
-      const parent = clockCanvas.parentElement;
-      const size = parent ? parent.clientWidth : clockCanvas.clientWidth || 600;
-      const dpr = window.devicePixelRatio || 1;
-      clockCanvas.width = size * dpr;
-      clockCanvas.height = size * dpr;
-      clockCanvas.style.width = size + "px";
-      clockCanvas.style.height = size + "px";
-      clockCtx.setTransform(1, 0, 0, 1, 0, 0);
-      clockCtx.scale(dpr, dpr);
-      if (lastClockState) {
-        drawClockTexture(lastClockState, clockRotation);
-      }
-    }
-
-    function drawClockTexture(state, rotationValue = 0) {
-      if (!clockCtx || !state) return;
-      const size = clockCanvas.clientWidth;
+    function createCompassClock() {
+      const size = compassClock.offsetWidth;
       const center = size / 2;
-      clockCtx.clearRect(0, 0, size, size);
-      const bg = clockCtx.createRadialGradient(center, center, size * 0.05, center, center, size * 0.5);
-      bg.addColorStop(0, "rgba(14, 165, 233, 0.3)");
-      bg.addColorStop(1, "rgba(2, 6, 23, 0.9)");
-      clockCtx.fillStyle = bg;
-      clockCtx.fillRect(0, 0, size, size);
 
-      const rotationSeeds = [0.25, -0.18, 0.12, -0.1, 0.3];
-      const rings = [
-        { labels: MONTH_LABELS, radius: size * 0.18, highlight: state.month },
-        { labels: DAY_LABELS, radius: size * 0.28, highlight: state.day - 1 },
-        { labels: HOUR_LABELS, radius: size * 0.39, highlight: state.hour },
-        { labels: MINUTE_LABELS, radius: size * 0.51, highlight: state.minute },
-        { labels: SECOND_LABELS, radius: size * 0.63, highlight: state.second }
-      ];
+      rings.forEach(ring => {
+        clockElements[ring.id] = [];
+        const count = ring.items.length;
+        const radius = (size / 2) * ring.radius;
 
-      rings.forEach((ring, ringIndex) => {
-        const step = (Math.PI * 2) / ring.labels.length;
-        for (let i = 0; i < ring.labels.length; i++) {
-          const angle = -Math.PI / 2 + i * step + rotationValue * rotationSeeds[ringIndex];
-          const x = center + Math.cos(angle) * ring.radius;
-          const y = center + Math.sin(angle) * ring.radius;
-          const isActive = i === ring.highlight;
-          clockCtx.save();
-          clockCtx.translate(x, y);
-          clockCtx.rotate(angle + Math.PI / 2);
-          clockCtx.font = (isActive ? "600 " : "400 ") + Math.max(13, size * 0.02) + "px 'Noto Serif SC', 'PingFang SC', serif";
-          clockCtx.fillStyle = isActive
-            ? "rgba(248, 250, 252, 0.98)"
-            : "rgba(148, 163, 184," + (0.3 + ringIndex * 0.12) + ")";
-          clockCtx.textAlign = "center";
-          clockCtx.textBaseline = "middle";
-          clockCtx.fillText(ring.labels[i], 0, 0);
-          if (isActive) {
-            clockCtx.shadowColor = "rgba(6, 182, 212, 0.8)";
-            clockCtx.shadowBlur = 12;
-          }
-          clockCtx.restore();
-        }
+        ring.items.forEach((item, i) => {
+          const angle = (i / count) * Math.PI * 2 - Math.PI / 2;
+          const x = center + Math.cos(angle) * radius;
+          const y = center + Math.sin(angle) * radius;
+
+          const el = document.createElement('div');
+          el.className = 'clock-item';
+          el.textContent = item;
+          el.style.left = x + 'px';
+          el.style.top = y + 'px';
+          el.style.transform = 'translate(-50%, -50%)';
+
+          compassClock.appendChild(el);
+          clockElements[ring.id].push(el);
+        });
       });
     }
 
-    function startClockAnimation() {
-      if (clockAnimHandle) {
-        cancelAnimationFrame(clockAnimHandle);
+    function spawnBurstParticles(el) {
+      const rect = el.getBoundingClientRect();
+      const clockRect = compassClock.getBoundingClientRect();
+      const x = rect.left - clockRect.left + rect.width / 2;
+      const y = rect.top - clockRect.top + rect.height / 2;
+
+      for (let i = 0; i < 8; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'burst-particle';
+        const angle = (i / 8) * Math.PI * 2;
+        const distance = 30 + Math.random() * 20;
+        const endX = x + Math.cos(angle) * distance;
+        const endY = y + Math.sin(angle) * distance;
+
+        particle.style.left = x + 'px';
+        particle.style.top = y + 'px';
+        particle.style.background = \`hsl(\${120 + Math.random() * 60}, 70%, 60%)\`;
+        particle.style.setProperty('--end-x', endX + 'px');
+        particle.style.setProperty('--end-y', endY + 'px');
+
+        compassClock.appendChild(particle);
+
+        // 动画到终点
+        particle.animate([
+          { left: x + 'px', top: y + 'px', opacity: 1, transform: 'scale(1)' },
+          { left: endX + 'px', top: endY + 'px', opacity: 0, transform: 'scale(0)' }
+        ], {
+          duration: 600,
+          easing: 'ease-out'
+        });
+
+        setTimeout(() => particle.remove(), 600);
       }
-      clockFrameTime = 0;
-      const loop = (timestamp) => {
-        if (!clockCtx || !lastClockState) {
-          clockAnimHandle = requestAnimationFrame(loop);
-          return;
-        }
-        if (!clockFrameTime) {
-          clockFrameTime = timestamp;
-        }
-        const delta = timestamp - clockFrameTime;
-        clockFrameTime = timestamp;
-        clockRotation += delta * 0.0008;
-        drawClockTexture(lastClockState, clockRotation);
-        clockAnimHandle = requestAnimationFrame(loop);
-      };
-      clockAnimHandle = requestAnimationFrame(loop);
     }
 
-    function animateChip(el, value) {
-      if (!el || el.textContent === value) return;
-      el.textContent = value;
-      el.classList.remove("pulse");
-      void el.offsetWidth;
-      el.classList.add("pulse");
-    }
-
-    function updateClock() {
+    function updateCompassClock() {
       const now = new Date();
-      const state = {
+      const values = {
         month: now.getMonth(),
-        day: now.getDate(),
+        day: now.getDate() - 1,
         weekday: now.getDay(),
         hour: now.getHours(),
         minute: now.getMinutes(),
         second: now.getSeconds()
       };
-      lastClockState = state;
-      animateChip(cnMonthEl, MONTH_LABELS[state.month]);
-      animateChip(cnDayEl, DAY_LABELS[state.day - 1]);
-      animateChip(cnWeekEl, WEEK_LABELS[state.weekday]);
-      animateChip(cnHourEl, HOUR_LABELS[state.hour]);
-      animateChip(cnMinuteEl, MINUTE_LABELS[state.minute]);
-      animateChip(cnSecondEl, SECOND_LABELS[state.second]);
-    }
 
-    const particleCanvas = document.getElementById("particleCanvas");
-    let particleCtx = null;
-    let particles = [];
-    let viewWidth = window.innerWidth;
-    let viewHeight = window.innerHeight;
-    const PARTICLE_COUNT = 120;
+      // 更新中心文本
+      clockCenterText.innerHTML = \`
+        <span>\${chineseMonths[values.month]}</span>
+        <span>\${chineseDays[values.day]}</span>
+        <span>\${chineseWeekdays[values.weekday]}</span><br>
+        <span>\${chineseHours[values.hour]}</span>
+        <span>\${chineseMinutes[values.minute]}</span>
+        <span>\${chineseSeconds[values.second]}</span>
+      \`;
 
-    function createParticle() {
-      return {
-        x: Math.random() * viewWidth,
-        y: Math.random() * viewHeight,
-        vx: (Math.random() - 0.5) * 0.25,
-        vy: (Math.random() - 0.5) * 0.25,
-        size: Math.random() * 2 + 0.6,
-        alpha: Math.random() * 0.5 + 0.2,
-        life: Math.random() * 300 + 200
-      };
-    }
+      // 更新各环
+      Object.keys(values).forEach(key => {
+        const elements = clockElements[key];
+        if (!elements) return;
 
-    function resizeParticles() {
-      if (!particleCanvas || !particleCtx) return;
-      viewWidth = window.innerWidth;
-      viewHeight = window.innerHeight;
-      const dpr = window.devicePixelRatio || 1;
-      particleCanvas.width = viewWidth * dpr;
-      particleCanvas.height = viewHeight * dpr;
-      particleCtx.setTransform(1, 0, 0, 1, 0, 0);
-      particleCtx.scale(dpr, dpr);
-    }
+        elements.forEach((el, i) => {
+          const isActive = i === values[key];
+          const wasActive = el.classList.contains('active');
 
-    function drawParticles() {
-      if (!particleCtx) return;
-      particleCtx.clearRect(0, 0, viewWidth, viewHeight);
-      particles.forEach((p) => {
-        p.x += p.vx;
-        p.y += p.vy;
-        p.life -= 1;
-        if (p.x < -20 || p.x > viewWidth + 20 || p.y < -20 || p.y > viewHeight + 20 || p.life <= 0) {
-          Object.assign(p, createParticle());
-        }
-        const gradient = particleCtx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size * 6);
-        gradient.addColorStop(0, "rgba(45,212,191," + p.alpha + ")");
-        gradient.addColorStop(1, "rgba(13,148,136,0)");
-        particleCtx.fillStyle = gradient;
-        particleCtx.beginPath();
-        particleCtx.arc(p.x, p.y, p.size * 6, 0, Math.PI * 2);
-        particleCtx.fill();
+          if (isActive && !wasActive) {
+            el.classList.add('active');
+            el.classList.add('rotating');
+            spawnBurstParticles(el);
+
+            setTimeout(() => {
+              el.classList.remove('rotating');
+            }, 600);
+          } else if (!isActive && wasActive) {
+            el.classList.remove('active');
+          }
+        });
       });
-      requestAnimationFrame(drawParticles);
+
+      lastValues = values;
     }
 
-    function initParticles() {
-      if (!particleCanvas) return;
-      particleCtx = particleCanvas.getContext("2d");
-      resizeParticles();
-      particles = new Array(PARTICLE_COUNT).fill(0).map(createParticle);
-      requestAnimationFrame(drawParticles);
-    }
+    // 初始化时钟
+    createCompassClock();
+    updateCompassClock();
+    setInterval(updateCompassClock, 1000);
 
-    window.addEventListener("resize", () => {
-      resizeParticles();
-      resizeClockCanvas();
+    // 窗口大小变化时重建时钟
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        // 清除现有元素
+        const items = compassClock.querySelectorAll('.clock-item');
+        items.forEach(item => item.remove());
+        clockElements = {};
+        createCompassClock();
+        updateCompassClock();
+      }, 200);
     });
 
+    // === Docker 发行版切换 ===
+    const distroTabs = document.querySelectorAll('.distro-tab');
+    const distroContents = document.querySelectorAll('.distro-content');
+
+    distroTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const distro = tab.dataset.distro;
+
+        distroTabs.forEach(t => t.classList.remove('active'));
+        distroContents.forEach(c => c.classList.remove('active'));
+
+        tab.classList.add('active');
+        document.querySelector(\`.distro-content[data-distro="\${distro}"]\`).classList.add('active');
+      });
+    });
+
+    // === 悬浮访问信息窗 ===
     const infoPanel = document.getElementById("infoPanel");
     const infoToggle = document.getElementById("infoToggle");
+
+    function pad(n) {
+      return n.toString().padStart(2, "0");
+    }
 
     function initVisitorInfo() {
       const now = new Date();
@@ -1063,14 +1259,11 @@ const HTML = `<!DOCTYPE html>
       });
     }
 
-    initClockCanvas();
-    updateClock();
-    startClockAnimation();
+    // 初始化
     convert();
-    initParticles();
-    setInterval(updateClock, 1000);
     initVisitorInfo();
 
+    // === busuanzi ===
     (function initBusuanzi() {
       if (location.hostname === "url.hxorz.cn") {
         var s = document.createElement("script");
