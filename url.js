@@ -1611,7 +1611,7 @@ docker info | grep -A 5 "Registry Mirrors"</pre>
 ];
 
 
-    let currentIndex = 0;
+    let currentIndex = Math.floor(Math.random() * securityKnowledge.length);
     let charIndex = 0;
     let isDeleting = false;
     let typingSpeed = 50;
