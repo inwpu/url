@@ -37,6 +37,7 @@ const HTML = `<!DOCTYPE html>
       height: 100%;
       z-index: 0;
       pointer-events: none;
+      will-change: transform;
     }
 
     .page {
@@ -146,6 +147,8 @@ const HTML = `<!DOCTYPE html>
       margin-bottom: 20px;
       position: relative;
       overflow: visible;
+      will-change: border-color;
+      transform: translateZ(0);
     }
     .card::before {
       content: '';
@@ -156,17 +159,19 @@ const HTML = `<!DOCTYPE html>
       border-radius: 4px;
       z-index: 10;
       animation: particleMove 12s linear infinite, particleGlow 3s linear infinite, particleBreathe 2s ease-in-out infinite;
+      will-change: transform, box-shadow, width, height, opacity;
+      transform: translateZ(0);
     }
     @keyframes particleMove {
-      0% { top: -2px; left: 20px; transform: translateX(0) rotate(0deg); }
-      25% { top: -2px; left: calc(100% - 60px); transform: translateX(0) rotate(0deg); }
-      25.1% { top: 20px; left: calc(100% - 2px); transform: translateY(0) rotate(90deg); }
-      50% { top: calc(100% - 60px); left: calc(100% - 2px); transform: translateY(0) rotate(90deg); }
-      50.1% { top: calc(100% - 2px); left: calc(100% - 60px); transform: translateX(0) rotate(180deg); }
-      75% { top: calc(100% - 2px); left: 20px; transform: translateX(0) rotate(180deg); }
-      75.1% { top: calc(100% - 60px); left: -2px; transform: translateY(0) rotate(270deg); }
-      99.9% { top: 20px; left: -2px; transform: translateY(0) rotate(270deg); }
-      100% { top: -2px; left: 20px; transform: translateX(0) rotate(0deg); }
+      0% { top: -2px; left: 20px; transform: translateX(0) rotate(0deg) translateZ(0); }
+      25% { top: -2px; left: calc(100% - 60px); transform: translateX(0) rotate(0deg) translateZ(0); }
+      25.1% { top: 20px; left: calc(100% - 2px); transform: translateY(0) rotate(90deg) translateZ(0); }
+      50% { top: calc(100% - 60px); left: calc(100% - 2px); transform: translateY(0) rotate(90deg) translateZ(0); }
+      50.1% { top: calc(100% - 2px); left: calc(100% - 60px); transform: translateX(0) rotate(180deg) translateZ(0); }
+      75% { top: calc(100% - 2px); left: 20px; transform: translateX(0) rotate(180deg) translateZ(0); }
+      75.1% { top: calc(100% - 60px); left: -2px; transform: translateY(0) rotate(270deg) translateZ(0); }
+      99.9% { top: 20px; left: -2px; transform: translateY(0) rotate(270deg) translateZ(0); }
+      100% { top: -2px; left: 20px; transform: translateX(0) rotate(0deg) translateZ(0); }
     }
     @keyframes particleGlow {
       0% { box-shadow: 0 0 8px #ff0000, 0 0 20px #ff0000, 0 0 30px #ff0000; background: linear-gradient(90deg, transparent, #ff0000, transparent); }
@@ -220,12 +225,14 @@ const HTML = `<!DOCTYPE html>
       transition: all 0.3s ease;
       box-shadow: 0 0 15px rgba(56, 189, 248, 0.2), inset 0 0 10px rgba(56, 189, 248, 0.05);
       position: relative;
+      transform: translateZ(0);
     }
     input:focus, textarea:focus {
       border-color: #38bdf8;
       box-shadow: 0 0 20px rgba(56, 189, 248, 0.35), 0 0 40px rgba(34, 197, 94, 0.15), inset 0 0 12px rgba(56, 189, 248, 0.08);
       background: rgba(15, 23, 42, 0.95);
       animation: inputGlow 3s ease-in-out infinite;
+      will-change: border-color, box-shadow;
     }
     @keyframes inputGlow {
       0%, 100% {
@@ -275,6 +282,7 @@ const HTML = `<!DOCTYPE html>
       position: relative;
       overflow: hidden;
       box-shadow: 0 0 20px rgba(34, 197, 94, 0.4), 0 0 40px rgba(6, 182, 212, 0.2);
+      transform: translateZ(0);
     }
     .btn::before {
       content: '';
@@ -285,6 +293,7 @@ const HTML = `<!DOCTYPE html>
       height: 100%;
       background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
       animation: btnShine 2s infinite;
+      will-change: transform;
     }
     @keyframes btnShine {
       0% { left: -100%; }
@@ -355,6 +364,8 @@ const HTML = `<!DOCTYPE html>
       margin-bottom: 20px;
       position: relative;
       overflow: visible;
+      will-change: border-color;
+      transform: translateZ(0);
     }
     .docker-card::before {
       content: '';
@@ -365,6 +376,8 @@ const HTML = `<!DOCTYPE html>
       border-radius: 4px;
       z-index: 10;
       animation: particleMove 12s linear infinite reverse, particleGlow 3s linear infinite, particleBreathe 2s ease-in-out infinite;
+      will-change: transform, box-shadow, width, height, opacity;
+      transform: translateZ(0);
     }
 
     .docker-card h3 {
@@ -562,10 +575,13 @@ const HTML = `<!DOCTYPE html>
       input, textarea {
         font-size: 12px;
         padding: 8px 10px;
+        -webkit-tap-highlight-color: transparent;
       }
       .btn {
         font-size: 12px;
         padding: 0 12px;
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
       }
       .output-row {
         flex-direction: column;
@@ -580,6 +596,8 @@ const HTML = `<!DOCTYPE html>
       .distro-tab {
         padding: 5px 10px;
         font-size: 10px;
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
       }
       .code-block {
         font-size: 11px;
@@ -589,6 +607,17 @@ const HTML = `<!DOCTYPE html>
         width: 240px;
         font-size: 10px;
         padding: 8px 10px;
+      }
+
+      /* 移动端特殊优化 */
+      body {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        touch-action: pan-y;
+      }
+
+      * {
+        -webkit-tap-highlight-color: transparent;
       }
     }
 
@@ -826,74 +855,111 @@ docker info | grep -A 5 "Registry Mirrors"</pre>
   <button class="info-toggle" id="infoToggle">访问信息</button>
 
   <script>
-    // === 粒子动画背景（支持鼠标交互） ===
+    // === 粒子动画背景（支持鼠标交互） - 性能优化版 ===
     const canvas = document.getElementById('particles-canvas');
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d', { alpha: true, desynchronized: true });
     let particles = [];
     let animationId;
     let mouse = { x: null, y: null, radius: 200 };
+    let lastMouseUpdate = 0;
+    const MOUSE_THROTTLE = 16; // ~60fps
+
+    // 性能配置
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    const devicePixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+    let FPS_TARGET = isMobile ? 30 : 60;
+    let frameInterval = 1000 / FPS_TARGET;
+    let lastFrameTime = 0;
+
+    // 性能监控
+    let fpsHistory = [];
+    let performanceCheckInterval = 60; // 每60帧检查一次
+    let frameCount = 0;
+    let lastFpsCheck = performance.now();
+    let currentFPS = 60;
+    let particleQuality = 1.0; // 粒子质量系数(0.5-1.0)
 
     canvas.style.pointerEvents = 'auto';
 
     function resizeCanvas() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      canvas.width = width * devicePixelRatio;
+      canvas.height = height * devicePixelRatio;
+      canvas.style.width = width + 'px';
+      canvas.style.height = height + 'px';
+      ctx.scale(devicePixelRatio, devicePixelRatio);
     }
 
-    // 鼠标事件监听
-    window.addEventListener('mousemove', (e) => {
+    // 鼠标事件监听 - RAF节流优化
+    function updateMousePosition(e) {
+      const now = performance.now();
+      if (now - lastMouseUpdate < MOUSE_THROTTLE) return;
+      lastMouseUpdate = now;
       mouse.x = e.x;
       mouse.y = e.y;
-    });
+    }
+
+    window.addEventListener('mousemove', updateMousePosition, { passive: true });
 
     window.addEventListener('mouseout', () => {
       mouse.x = null;
       mouse.y = null;
-    });
+    }, { passive: true });
 
     class Particle {
       constructor() {
         this.reset();
+        this.createGradient();
       }
 
       reset() {
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+        this.x = Math.random() * w;
+        this.y = Math.random() * h;
         this.baseX = this.x;
         this.baseY = this.y;
         this.size = Math.random() * 3 + 1;
         this.speedX = (Math.random() - 0.5) * 0.8;
         this.speedY = (Math.random() - 0.5) * 0.8;
         this.opacity = Math.random() * 0.7 + 0.3;
-        this.hue = Math.random() * 60 + 120; // 绿色到青色
+        this.hue = Math.random() * 60 + 120;
         this.density = (Math.random() * 40) + 5;
       }
 
-      update() {
-        // 鼠标交互
-        if (mouse.x != null && mouse.y != null) {
-          let dx = mouse.x - this.x;
-          let dy = mouse.y - this.y;
-          let distance = Math.sqrt(dx * dx + dy * dy);
-          let forceDirectionX = dx / distance;
-          let forceDirectionY = dy / distance;
-          let maxDistance = mouse.radius;
-          let force = (maxDistance - distance) / maxDistance;
-          let directionX = forceDirectionX * force * this.density;
-          let directionY = forceDirectionY * force * this.density;
+      createGradient() {
+        // 预创建径向渐变，替代shadowBlur以提升性能
+        this.gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, this.size * 3);
+        const color = \`hsl(\${this.hue}, 70%, 60%)\`;
+        this.gradient.addColorStop(0, color);
+        this.gradient.addColorStop(0.4, \`hsla(\${this.hue}, 70%, 60%, 0.6)\`);
+        this.gradient.addColorStop(1, \`hsla(\${this.hue}, 70%, 60%, 0)\`);
+      }
 
-          if (distance < mouse.radius) {
+      update() {
+        // 鼠标交互 - 使用平方距离优化
+        if (mouse.x != null && mouse.y != null) {
+          const dx = mouse.x - this.x;
+          const dy = mouse.y - this.y;
+          const distSq = dx * dx + dy * dy;
+          const radiusSq = mouse.radius * mouse.radius;
+
+          if (distSq < radiusSq) {
+            const distance = Math.sqrt(distSq);
+            const forceDirectionX = dx / distance;
+            const forceDirectionY = dy / distance;
+            const force = (mouse.radius - distance) / mouse.radius;
+            const directionX = forceDirectionX * force * this.density;
+            const directionY = forceDirectionY * force * this.density;
+
             this.x -= directionX;
             this.y -= directionY;
           } else {
-            if (this.x !== this.baseX) {
-              let dx = this.x - this.baseX;
-              this.x -= dx / 20;
-            }
-            if (this.y !== this.baseY) {
-              let dy = this.y - this.baseY;
-              this.y -= dy / 20;
-            }
+            // 回归优化 - 减少计算
+            const returnSpeed = 0.05;
+            this.x += (this.baseX - this.x) * returnSpeed;
+            this.y += (this.baseY - this.y) * returnSpeed;
           }
         }
 
@@ -901,67 +967,88 @@ docker info | grep -A 5 "Registry Mirrors"</pre>
         this.baseX += this.speedX;
         this.baseY += this.speedY;
 
-        if (this.baseX < 0 || this.baseX > canvas.width) this.speedX *= -1;
-        if (this.baseY < 0 || this.baseY > canvas.height) this.speedY *= -1;
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+        if (this.baseX < 0 || this.baseX > w) this.speedX *= -1;
+        if (this.baseY < 0 || this.baseY > h) this.speedY *= -1;
 
-        // 缓慢回归
+        // 无鼠标时的缓慢回归
         if (mouse.x == null) {
-          if (this.x !== this.baseX) {
-            let dx = this.x - this.baseX;
-            this.x -= dx / 10;
-          }
-          if (this.y !== this.baseY) {
-            let dy = this.y - this.baseY;
-            this.y -= dy / 10;
-          }
+          const returnSpeed = 0.1;
+          this.x += (this.baseX - this.x) * returnSpeed;
+          this.y += (this.baseY - this.y) * returnSpeed;
         }
       }
 
       draw() {
+        // 使用预创建的渐变替代shadowBlur
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.globalAlpha = this.opacity;
+
+        // 绘制发光效果
+        ctx.fillStyle = this.gradient;
+        ctx.fillRect(-this.size * 3, -this.size * 3, this.size * 6, this.size * 6);
+
+        // 绘制粒子核心
         ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.arc(0, 0, this.size, 0, Math.PI * 2);
         ctx.fillStyle = \`hsla(\${this.hue}, 70%, 60%, \${this.opacity})\`;
         ctx.fill();
 
-        // 添加发光效果
-        ctx.shadowBlur = 15;
-        ctx.shadowColor = \`hsla(\${this.hue}, 70%, 60%, 0.5)\`;
+        ctx.restore();
       }
     }
 
     function initParticles() {
       particles = [];
-      const count = Math.min(180, Math.floor((canvas.width * canvas.height) / 8000));
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      // 自适应粒子数量
+      const baseCount = isMobile ? 60 : 120;
+      const count = Math.min(baseCount, Math.floor((w * h) / 12000));
       for (let i = 0; i < count; i++) {
         particles.push(new Particle());
       }
     }
 
     function connectParticles() {
+      const maxConnections = 3; // 限制每个粒子的最大连线数
+      const connectionDistance = 120;
+      const connectionDistanceSq = connectionDistance * connectionDistance;
+
       for (let i = 0; i < particles.length; i++) {
+        let connections = 0;
+
         for (let j = i + 1; j < particles.length; j++) {
+          if (connections >= maxConnections) break;
+
           const dx = particles[i].x - particles[j].x;
           const dy = particles[i].y - particles[j].y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
+          const distSq = dx * dx + dy * dy;
 
-          if (dist < 120) {
-            const opacity = (1 - dist / 120) * 0.2;
+          if (distSq < connectionDistanceSq) {
+            const dist = Math.sqrt(distSq);
+            const opacity = (1 - dist / connectionDistance) * 0.2;
             ctx.beginPath();
             ctx.strokeStyle = \`rgba(34, 197, 94, \${opacity})\`;
             ctx.lineWidth = 0.8;
             ctx.moveTo(particles[i].x, particles[i].y);
             ctx.lineTo(particles[j].x, particles[j].y);
             ctx.stroke();
+            connections++;
           }
         }
 
-        // 鼠标与粒子连线
+        // 鼠标与粒子连线 - 使用平方距离优化
         if (mouse.x != null && mouse.y != null) {
           const dx = particles[i].x - mouse.x;
           const dy = particles[i].y - mouse.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
+          const distSq = dx * dx + dy * dy;
+          const radiusSq = mouse.radius * mouse.radius;
 
-          if (dist < mouse.radius) {
+          if (distSq < radiusSq) {
+            const dist = Math.sqrt(distSq);
             const opacity = (1 - dist / mouse.radius) * 0.8;
             ctx.beginPath();
             ctx.strokeStyle = \`rgba(56, 189, 248, \${opacity})\`;
@@ -974,8 +1061,58 @@ docker info | grep -A 5 "Registry Mirrors"</pre>
       }
     }
 
-    function animateParticles() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // 性能监控函数
+    function checkPerformance(currentTime) {
+      frameCount++;
+      if (frameCount >= performanceCheckInterval) {
+        const elapsed = currentTime - lastFpsCheck;
+        currentFPS = (frameCount / elapsed) * 1000;
+        fpsHistory.push(currentFPS);
+        if (fpsHistory.length > 5) fpsHistory.shift();
+
+        const avgFPS = fpsHistory.reduce((a, b) => a + b, 0) / fpsHistory.length;
+
+        // 自适应降级
+        if (avgFPS < 25 && particleQuality > 0.5) {
+          particleQuality -= 0.1;
+          adjustParticleCount();
+        } else if (avgFPS > 50 && particleQuality < 1.0) {
+          particleQuality += 0.05;
+          adjustParticleCount();
+        }
+
+        frameCount = 0;
+        lastFpsCheck = currentTime;
+      }
+    }
+
+    function adjustParticleCount() {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      const baseCount = isMobile ? 60 : 120;
+      const targetCount = Math.floor(Math.min(baseCount, (w * h) / 12000) * particleQuality);
+
+      if (particles.length > targetCount) {
+        particles = particles.slice(0, targetCount);
+      } else if (particles.length < targetCount) {
+        while (particles.length < targetCount) {
+          particles.push(new Particle());
+        }
+      }
+    }
+
+    function animateParticles(currentTime) {
+      // 帧率控制
+      if (currentTime - lastFrameTime < frameInterval) {
+        animationId = requestAnimationFrame(animateParticles);
+        return;
+      }
+      lastFrameTime = currentTime;
+
+      // 性能监控
+      checkPerformance(currentTime);
+
+      ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
       for (const particle of particles) {
         particle.update();
@@ -988,12 +1125,30 @@ docker info | grep -A 5 "Registry Mirrors"</pre>
 
     resizeCanvas();
     initParticles();
-    animateParticles();
+    animateParticles(0);
 
+    // resize事件防抖优化
+    let resizeTimeout;
     window.addEventListener('resize', () => {
-      resizeCanvas();
-      initParticles();
-    });
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        resizeCanvas();
+        initParticles();
+      }, 200);
+    }, { passive: true });
+
+    // 页面可见性优化 - 页面隐藏时暂停动画
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        cancelAnimationFrame(animationId);
+        if (typewriterRAF) cancelAnimationFrame(typewriterRAF);
+      } else {
+        lastFrameTime = performance.now();
+        animateParticles(performance.now());
+        lastTypeTime = performance.now();
+        typeWriter(performance.now());
+      }
+    }, { passive: true });
 
     // === 平台规则 ===
     const PLATFORMS = [
@@ -1324,15 +1479,15 @@ docker info | grep -A 5 "Registry Mirrors"</pre>
       }
     }
 
-    originalInput.addEventListener("input", () => {
-      clearTimeout(window.__xgetTimer);
-      window.__xgetTimer = setTimeout(convert, 120);
-    });
+    // 防抖优化的输入事件
+    let convertTimer;
+    function debouncedConvert() {
+      clearTimeout(convertTimer);
+      convertTimer = setTimeout(convert, 120);
+    }
 
-    instanceInput.addEventListener("input", () => {
-      clearTimeout(window.__xgetTimer);
-      window.__xgetTimer = setTimeout(convert, 120);
-    });
+    originalInput.addEventListener("input", debouncedConvert, { passive: true });
+    instanceInput.addEventListener("input", debouncedConvert, { passive: true });
 
     copyBtn.addEventListener("click", async () => {
       const text = convertedInput.value.trim();
@@ -1460,8 +1615,17 @@ docker info | grep -A 5 "Registry Mirrors"</pre>
     let charIndex = 0;
     let isDeleting = false;
     let typingSpeed = 50;
+    let typewriterRAF = null;
+    let lastTypeTime = 0;
 
-    function typeWriter() {
+    function typeWriter(timestamp = 0) {
+      // RAF优化的打字机效果
+      if (timestamp - lastTypeTime < typingSpeed) {
+        typewriterRAF = requestAnimationFrame(typeWriter);
+        return;
+      }
+      lastTypeTime = timestamp;
+
       const currentText = securityKnowledge[currentIndex];
 
       if (isDeleting) {
@@ -1475,15 +1639,15 @@ docker info | grep -A 5 "Registry Mirrors"</pre>
       }
 
       if (!isDeleting && charIndex === currentText.length) {
-        typingSpeed = 2000; // 完成后暂停
+        typingSpeed = 2000;
         isDeleting = true;
       } else if (isDeleting && charIndex === 0) {
         isDeleting = false;
         currentIndex = (currentIndex + 1) % securityKnowledge.length;
-        typingSpeed = 500; // 切换前暂停
+        typingSpeed = 500;
       }
 
-      setTimeout(typeWriter, typingSpeed);
+      typewriterRAF = requestAnimationFrame(typeWriter);
     }
 
     // 启动打字机效果
