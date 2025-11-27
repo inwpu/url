@@ -1241,6 +1241,14 @@ docker info</pre>
     const cmdCopyBtn = document.getElementById("copyCmdBtn");
     const cmdHint = document.getElementById("commandHint");
 
+    // 调试：检查元素是否成功获取
+    if (!originalInput || !convertedInput) {
+      console.error('关键元素未找到:', {
+        originalInput: !!originalInput,
+        convertedInput: !!convertedInput
+      });
+    }
+
     function normalizeInstanceUrl(url) {
       if (!url) return "";
       url = url.trim();
@@ -1568,8 +1576,10 @@ docker info</pre>
     }
 
     function convert() {
+      console.log('[转换器] convert函数被调用');
       const rawInstance = instanceInput.value;
       const rawUrl = originalInput.value.trim();
+      console.log('[转换器] 输入内容:', rawUrl);
 
       statusEl.textContent = "";
       statusEl.className = "status";
@@ -1578,11 +1588,14 @@ docker info</pre>
 
       if (!rawUrl) {
         convertedInput.value = "";
+        console.log('[转换器] 输入为空，跳过转换');
         return;
       }
 
       // 首先尝试识别为命令
+      console.log('[转换器] 开始识别命令');
       const cmdResult = detectAndConvertCommand(rawUrl);
+      console.log('[转换器] 命令识别结果:', cmdResult);
       if (cmdResult.isCommand) {
         convertedInput.value = cmdResult.converted;
         statusEl.textContent = "已识别为 " + cmdResult.platform.toUpperCase() + " 命令，已自动转换为加速版本 ✅";
@@ -1660,15 +1673,20 @@ docker info</pre>
     }
 
     // 防抖优化的输入事件
-    originalInput.addEventListener("input", () => {
-      clearTimeout(window.__xgetTimer);
-      window.__xgetTimer = setTimeout(convert, 120);
-    });
+    if (originalInput) {
+      originalInput.addEventListener("input", () => {
+        console.log('[转换器] 检测到输入变化');
+        clearTimeout(window.__xgetTimer);
+        window.__xgetTimer = setTimeout(convert, 120);
+      });
+    }
 
-    instanceInput.addEventListener("input", () => {
-      clearTimeout(window.__xgetTimer);
-      window.__xgetTimer = setTimeout(convert, 120);
-    });
+    if (instanceInput) {
+      instanceInput.addEventListener("input", () => {
+        clearTimeout(window.__xgetTimer);
+        window.__xgetTimer = setTimeout(convert, 120);
+      });
+    }
 
     copyBtn.addEventListener("click", async () => {
       const text = convertedInput.value.trim();
