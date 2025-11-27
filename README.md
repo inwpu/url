@@ -296,7 +296,7 @@ MIT License
 
 ## 更新日志
 
-### v1.1.0 (2025-01)
+### v1.1.0 (2025-11)
 - 新增命令识别和自动转换功能
 - 支持 git clone、npm install、pip install 等命令
 - 修复 URL 路径拼接的双斜杠问题

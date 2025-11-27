@@ -671,7 +671,7 @@ const HTML = `<!DOCTYPE html>
     <main class="main">
       <header class="header">
         <div class="header-title">
-          Xget URL 转换器
+          hxorz URL 转换器
           <span class="header-badge">hxorz.cn 实例</span>
         </div>
         <div class="header-sub">
@@ -704,7 +704,7 @@ const HTML = `<!DOCTYPE html>
         </div>
 
         <div class="field">
-          <label for="convertedUrl">转换后的 Xget URL</label>
+          <label for="convertedUrl">转换后的 hxorz URL</label>
           <div class="output-row">
             <textarea id="convertedUrl" readonly placeholder="转换结果会显示在这里"></textarea>
             <button id="copyBtn" class="btn" type="button">
