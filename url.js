@@ -1660,14 +1660,15 @@ docker info</pre>
     }
 
     // 防抖优化的输入事件
-    let convertTimer;
-    function debouncedConvert() {
-      clearTimeout(convertTimer);
-      convertTimer = setTimeout(convert, 120);
-    }
+    originalInput.addEventListener("input", () => {
+      clearTimeout(window.__xgetTimer);
+      window.__xgetTimer = setTimeout(convert, 120);
+    });
 
-    originalInput.addEventListener("input", debouncedConvert, { passive: true });
-    instanceInput.addEventListener("input", debouncedConvert, { passive: true });
+    instanceInput.addEventListener("input", () => {
+      clearTimeout(window.__xgetTimer);
+      window.__xgetTimer = setTimeout(convert, 120);
+    });
 
     copyBtn.addEventListener("click", async () => {
       const text = convertedInput.value.trim();
@@ -1879,8 +1880,11 @@ docker info</pre>
 
       // 尝试多个 IP 查询 API，优先使用国内可访问的
       const ipApis = [
+        { url: "https://api.ipify.org?format=json", parser: data => JSON.parse(data).ip },
         { url: "https://api.ip.sb/ip", parser: text => text.trim() },
-        { url: "https://api.ipify.org?format=json", parser: data => JSON.parse(data).ip }
+        { url: "https://api.seeip.org", parser: text => text.trim() },
+        { url: "https://ipinfo.io/ip", parser: text => text.trim() },
+        { url: "https://icanhazip.com", parser: text => text.trim() }
       ];
 
       (async function getIP() {
