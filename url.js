@@ -671,9 +671,9 @@ const HTML = `<!DOCTYPE html>
         </div>
 
         <div class="field">
-          <label for="originalUrl">原始 URL</label>
-          <textarea id="originalUrl" placeholder="粘贴 GitHub / Docker Hub / GHCR / Hugging Face / npm / PyPI 等原始链接"></textarea>
-          <small>平台将自动识别并生成加速 URL。</small>
+          <label for="originalUrl">原始 URL 或命令</label>
+          <textarea id="originalUrl" placeholder="粘贴 URL 链接或输入命令（支持 docker pull / git clone / npm install / pip install 等）"></textarea>
+          <small>支持 URL 链接和安装命令，自动识别平台并生成加速版本。例如：docker pull nginx、git clone https://github.com/xxx/xxx、npm install react 等。</small>
         </div>
 
         <div class="field">
@@ -729,13 +729,15 @@ const HTML = `<!DOCTYPE html>
         </div>
 
         <div class="distro-section">
-          <h4>常见 Linux 发行版配置方法</h4>
+          <h4>各操作系统配置方法</h4>
           <div class="distro-tabs">
             <button class="distro-tab active" data-distro="ubuntu">Ubuntu/Debian</button>
             <button class="distro-tab" data-distro="centos">CentOS/RHEL</button>
             <button class="distro-tab" data-distro="arch">Arch Linux</button>
             <button class="distro-tab" data-distro="fedora">Fedora</button>
             <button class="distro-tab" data-distro="opensuse">openSUSE</button>
+            <button class="distro-tab" data-distro="macos">macOS</button>
+            <button class="distro-tab" data-distro="windows">Windows</button>
           </div>
 
           <div class="distro-content active" data-distro="ubuntu">
@@ -749,11 +751,10 @@ sudo tee /etc/docker/daemon.json &lt;&lt;EOF
 EOF
 
 # 2. 重启 Docker 服务
-sudo systemctl daemon-reload
 sudo systemctl restart docker
 
 # 3. 验证配置是否生效
-docker info | grep -A 5 "Registry Mirrors"</pre>
+docker info</pre>
             </div>
           </div>
 
@@ -768,11 +769,10 @@ sudo tee /etc/docker/daemon.json &lt;&lt;EOF
 EOF
 
 # 2. 重启 Docker 服务
-sudo systemctl daemon-reload
 sudo systemctl restart docker
 
 # 3. 验证配置是否生效
-docker info | grep -A 5 "Registry Mirrors"</pre>
+docker info</pre>
             </div>
           </div>
 
@@ -787,11 +787,10 @@ sudo tee /etc/docker/daemon.json &lt;&lt;EOF
 EOF
 
 # 2. 重启 Docker 服务
-sudo systemctl daemon-reload
 sudo systemctl restart docker
 
 # 3. 验证配置是否生效
-docker info | grep -A 5 "Registry Mirrors"</pre>
+docker info</pre>
             </div>
           </div>
 
@@ -806,11 +805,10 @@ sudo tee /etc/docker/daemon.json &lt;&lt;EOF
 EOF
 
 # 2. 重启 Docker 服务
-sudo systemctl daemon-reload
 sudo systemctl restart docker
 
 # 3. 验证配置是否生效
-docker info | grep -A 5 "Registry Mirrors"</pre>
+docker info</pre>
             </div>
           </div>
 
@@ -828,7 +826,53 @@ EOF
 sudo systemctl restart docker
 
 # 3. 验证配置是否生效
-docker info | grep -A 5 "Registry Mirrors"</pre>
+docker info</pre>
+            </div>
+          </div>
+
+          <div class="distro-content" data-distro="macos">
+            <div class="code-block">
+              <pre># macOS Docker Desktop 配置方法
+
+# 方法 1：通过图形界面配置（推荐）
+1. 打开 Docker Desktop
+2. 点击菜单栏 Docker 图标 → Preferences（设置）
+3. 选择 Docker Engine
+4. 在 JSON 配置中添加或修改：
+{
+  "registry-mirrors": ["https://hub.hxorz.cn"]
+}
+5. 点击 "Apply & Restart" 应用并重启
+
+# 方法 2：直接编辑配置文件
+# 配置文件位置：
+# ~/Library/Group Containers/group.com.docker/settings-store.json
+
+# 验证配置是否生效
+docker info</pre>
+            </div>
+          </div>
+
+          <div class="distro-content" data-distro="windows">
+            <div class="code-block">
+              <pre># Windows Docker Desktop 配置方法
+
+# 方法 1：通过图形界面配置（推荐）
+1. 打开 Docker Desktop
+2. 点击系统托盘 Docker 图标 → Settings（设置）
+3. 选择 Docker Engine
+4. 在 JSON 配置中添加或修改：
+{
+  "registry-mirrors": ["https://hub.hxorz.cn"]
+}
+5. 点击 "Apply & Restart" 应用并重启
+
+# 方法 2：直接编辑配置文件
+# 配置文件位置：
+# C:\Users\[USERNAME]\AppData\Roaming\Docker\settings-store.json
+
+# 验证配置是否生效
+docker info</pre>
             </div>
           </div>
         </div>
@@ -1203,8 +1247,9 @@ docker info | grep -A 5 "Registry Mirrors"</pre>
       if (!/^https?:\\/\\//i.test(url)) {
         url = "https://" + url;
       }
-      // 只替换路径中的多余斜杠，不影响 ://
-      return url.replace(/([^:])\\/{2,}/g, "$1/").replace(/\\/+$/, "");
+      // 移除尾部斜杠
+      url = url.replace(/\\/+$/, "");
+      return url;
     }
 
     function detectPlatform(u, raw) {
@@ -1411,6 +1456,144 @@ docker info | grep -A 5 "Registry Mirrors"</pre>
       return cmds.join("\\n");
     }
 
+    // 识别并转换命令
+    function detectAndConvertCommand(input) {
+      input = input.trim();
+
+      // Docker 命令识别
+      const dockerPullMatch = input.match(/docker\s+pull\s+([^\s]+)/i);
+      if (dockerPullMatch) {
+        const imageName = dockerPullMatch[1];
+        // 如果已经包含加速域名，直接返回
+        if (imageName.includes('hub.hxorz.cn')) {
+          return { isCommand: true, converted: input, platform: 'docker', original: imageName };
+        }
+        // 转换为加速镜像
+        const acceleratedImage = 'hub.hxorz.cn/' + imageName.replace(/^(docker\.io\/|registry-1\.docker\.io\/)?/, '');
+        return {
+          isCommand: true,
+          converted: input.replace(imageName, acceleratedImage),
+          platform: 'docker',
+          original: imageName
+        };
+      }
+
+      // Git clone 命令识别 (支持各种参数)
+      const gitCloneMatch = input.match(/git\s+clone\s+(?:(?:--?\w+(?:[=\s]+[^\s]+)?)\s+)*(https?:\/\/[^\s]+)/i);
+      if (gitCloneMatch) {
+        const repoUrl = gitCloneMatch[1];
+        try {
+          const u = new URL(repoUrl);
+          if (u.host === 'github.com') {
+            const cleanPath = u.pathname.startsWith('/') ? u.pathname.substring(1) : u.pathname;
+            const acceleratedUrl = 'https://hxorz.cn/gh/' + cleanPath + u.search + u.hash;
+            return {
+              isCommand: true,
+              converted: input.replace(repoUrl, acceleratedUrl),
+              platform: 'github',
+              original: repoUrl
+            };
+          } else if (u.host === 'gitlab.com') {
+            const cleanPath = u.pathname.startsWith('/') ? u.pathname.substring(1) : u.pathname;
+            const acceleratedUrl = 'https://hxorz.cn/gl/' + cleanPath + u.search + u.hash;
+            return {
+              isCommand: true,
+              converted: input.replace(repoUrl, acceleratedUrl),
+              platform: 'gitlab',
+              original: repoUrl
+            };
+          }
+        } catch (e) {}
+      }
+
+      // npm install 命令识别
+      const npmInstallMatch = input.match(/npm\s+install\s+(?:-[gD]\s+)?(['"]?)([^\s'"]+)\1/i);
+      if (npmInstallMatch) {
+        const packageSpec = npmInstallMatch[2];
+        // 如果是URL格式
+        if (packageSpec.startsWith('http')) {
+          try {
+            const u = new URL(packageSpec);
+            if (u.host.includes('npmjs.org')) {
+              const cleanPath = u.pathname.startsWith('/') ? u.pathname.substring(1) : u.pathname;
+              const acceleratedUrl = 'https://hxorz.cn/npm/' + cleanPath + u.search + u.hash;
+              return {
+                isCommand: true,
+                converted: input.replace(packageSpec, acceleratedUrl),
+                platform: 'npm',
+                original: packageSpec
+              };
+            }
+          } catch (e) {}
+        }
+        // 普通包名，添加镜像源
+        return {
+          isCommand: true,
+          converted: input + ' --registry=https://hxorz.cn/npm',
+          platform: 'npm',
+          original: packageSpec
+        };
+      }
+
+      // pip install 命令识别
+      const pipInstallMatch = input.match(/pip(?:3)?\s+install\s+(?:-[^\s]+\s+)*(['"]?)([^\s'"]+)\1/i);
+      if (pipInstallMatch) {
+        const packageSpec = pipInstallMatch[2];
+        // 如果是URL格式
+        if (packageSpec.startsWith('http')) {
+          try {
+            const u = new URL(packageSpec);
+            if (u.host.includes('pypi.org') || u.host.includes('python.org')) {
+              const cleanPath = u.pathname.startsWith('/') ? u.pathname.substring(1) : u.pathname;
+              const acceleratedUrl = 'https://hxorz.cn/pypi/' + cleanPath + u.search + u.hash;
+              return {
+                isCommand: true,
+                converted: input.replace(packageSpec, acceleratedUrl),
+                platform: 'pypi',
+                original: packageSpec
+              };
+            }
+          } catch (e) {}
+        }
+        // 普通包名，添加镜像源
+        if (!input.includes(' -i ') && !input.includes('--index-url')) {
+          return {
+            isCommand: true,
+            converted: input + ' -i https://hxorz.cn/pypi/simple',
+            platform: 'pypi',
+            original: packageSpec
+          };
+        }
+      }
+
+      // curl/wget 下载命令识别
+      const curlMatch = input.match(/(?:curl|wget)\s+(?:-[^\s]+\s+)*(['"]?)([^\s'"]+)\1/i);
+      if (curlMatch) {
+        const urlStr = curlMatch[2];
+        try {
+          const u = new URL(urlStr);
+          const platform = detectPlatform(u, urlStr);
+          if (platform) {
+            let acceleratedUrl;
+            if (platform.id === 'docker') {
+              acceleratedUrl = 'https://hub.hxorz.cn' + u.pathname + u.search + u.hash;
+            } else {
+              const cleanPath = u.pathname.startsWith('/') ? u.pathname.substring(1) : u.pathname;
+              acceleratedUrl = 'https://hxorz.cn/' + platform.prefix + '/' + cleanPath + u.search + u.hash;
+            }
+            return {
+              isCommand: true,
+              converted: input.replace(urlStr, acceleratedUrl),
+              platform: platform.id,
+              original: urlStr
+            };
+          }
+        } catch (e) {}
+      }
+
+      return { isCommand: false };
+    }
+
     function convert() {
       const rawInstance = instanceInput.value;
       const rawUrl = originalInput.value.trim();
@@ -1425,11 +1608,33 @@ docker info | grep -A 5 "Registry Mirrors"</pre>
         return;
       }
 
+      // 首先尝试识别为命令
+      const cmdResult = detectAndConvertCommand(rawUrl);
+      if (cmdResult.isCommand) {
+        convertedInput.value = cmdResult.converted;
+        statusEl.textContent = "已识别为 " + cmdResult.platform.toUpperCase() + " 命令，已自动转换为加速版本 ✅";
+        statusEl.classList.add("ok");
+
+        // 生成该平台的推荐命令
+        const platformObj = PLATFORMS.find(p => p.id === cmdResult.platform);
+        if (platformObj) {
+          const cmdText = buildCommands(platformObj, cmdResult.converted);
+          cmdOutput.value = cmdText;
+          if (cmdText) {
+            cmdHint.textContent = "已为 " + platformObj.name + " 生成推荐命令，可直接复制到终端执行（按需修改）。";
+            cmdOutput.style.height = 'auto';
+            cmdOutput.style.height = cmdOutput.scrollHeight + 'px';
+          }
+        }
+        return;
+      }
+
+      // 如果不是命令，尝试解析为URL
       let u;
       try {
         u = new URL(rawUrl);
       } catch (e) {
-        statusEl.textContent = "原始 URL 无法解析，请检查是否粘贴完整。";
+        statusEl.textContent = "输入无法识别为URL或命令，请检查格式。";
         statusEl.classList.add("err");
         convertedInput.value = "";
         return;
@@ -1460,7 +1665,9 @@ docker info | grep -A 5 "Registry Mirrors"</pre>
           convertedInput.value = "";
           return;
         }
-        result = effectiveInstance + "/" + platform.prefix + path + query + hash;
+        // 构建正确的加速URL: https://hxorz.cn/gh/path (去掉path开头的/)
+        const cleanPath = path.startsWith('/') ? path.substring(1) : path;
+        result = effectiveInstance + "/" + platform.prefix + "/" + cleanPath + query + hash;
         statusEl.textContent = "已识别平台：" + platform.name + "，转换成功 ✅";
       }
 
