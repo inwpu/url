@@ -1460,7 +1460,7 @@ docker info</pre>
       input = input.trim();
 
       // Git clone 命令识别 (支持各种参数)
-      const gitCloneMatch = input.match(/git\s+clone\s+(?:(?:--?\w+(?:[=\s]+[^\s]+)?)\s+)*(https?:\/\/[^\s]+)/i);
+      const gitCloneMatch = input.match(/git\\s+clone\\s+(?:(?:--?\\w+(?:[=\\s]+[^\\s]+)?)\\s+)*(https?:\\/\\/[^\\s]+)/i);
       if (gitCloneMatch) {
         const repoUrl = gitCloneMatch[1];
         try {
@@ -1488,7 +1488,7 @@ docker info</pre>
       }
 
       // npm install 命令识别
-      const npmInstallMatch = input.match(/npm\s+install\s+(?:-[gD]\s+)?(['"]?)([^\s'"]+)\\1/i);
+      const npmInstallMatch = input.match(/npm\\s+install\\s+(?:-[gD]\\s+)?(['"]?)([^\\s'"]+)\\1/i);
       if (npmInstallMatch) {
         const packageSpec = npmInstallMatch[2];
         // 如果是URL格式
@@ -1517,7 +1517,7 @@ docker info</pre>
       }
 
       // pip install 命令识别
-      const pipInstallMatch = input.match(/pip(?:3)?\s+install\s+(?:-[^\s]+\s+)*(['"]?)([^\s'"]+)\\1/i);
+      const pipInstallMatch = input.match(/pip(?:3)?\\s+install\\s+(?:-[^\\s]+\\s+)*(['"]?)([^\\s'"]+)\\1/i);
       if (pipInstallMatch) {
         const packageSpec = pipInstallMatch[2];
         // 如果是URL格式
@@ -1548,7 +1548,7 @@ docker info</pre>
       }
 
       // curl/wget 下载命令识别
-      const curlMatch = input.match(/(?:curl|wget)\s+(?:-[^\s]+\s+)*(['"]?)([^\s'"]+)\\1/i);
+      const curlMatch = input.match(/(?:curl|wget)\\s+(?:-[^\\s]+\\s+)*(['"]?)([^\\s'"]+)\\1/i);
       if (curlMatch) {
         const urlStr = curlMatch[2];
         try {
@@ -1898,11 +1898,8 @@ docker info</pre>
 
       // 尝试多个 IP 查询 API，优先使用国内可访问的
       const ipApis = [
-        { url: "https://api.ipify.org?format=json", parser: data => JSON.parse(data).ip },
         { url: "https://api.ip.sb/ip", parser: text => text.trim() },
-        { url: "https://api.seeip.org", parser: text => text.trim() },
-        { url: "https://ipinfo.io/ip", parser: text => text.trim() },
-        { url: "https://icanhazip.com", parser: text => text.trim() }
+        { url: "https://api.ipify.org?format=json", parser: data => JSON.parse(data).ip }
       ];
 
       (async function getIP() {
