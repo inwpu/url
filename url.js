@@ -635,6 +635,33 @@ const HTML = `<!DOCTYPE html>
         height: 2px;
       }
     }
+
+    /* Giscus 评论区样式 */
+    .giscus-section {
+      margin-top: 40px;
+      padding: 24px;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(12px);
+      border-radius: 16px;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    }
+    .giscus-section h3 {
+      color: #38bdf8;
+      font-size: 20px;
+      margin: 0 0 20px 0;
+      text-align: center;
+    }
+    @media (max-width: 768px) {
+      .giscus-section {
+        margin-top: 24px;
+        padding: 16px;
+      }
+      .giscus-section h3 {
+        font-size: 16px;
+        margin-bottom: 16px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -876,6 +903,12 @@ docker info</pre>
             </div>
           </div>
         </div>
+      </section>
+
+      <!-- Giscus 评论区 -->
+      <section class="giscus-section">
+        <h3>评论交流</h3>
+        <div class="giscus"></div>
       </section>
     </main>
   </div>
@@ -1959,6 +1992,30 @@ docker info</pre>
             el.style.display = "none";
           }
         });
+      }
+    })();
+
+    // === Giscus 评论系统 ===
+    (function initGiscus() {
+      var script = document.createElement("script");
+      script.src = "https://giscus.app/client.js";
+      script.setAttribute("data-repo", "inwpu/url");
+      script.setAttribute("data-repo-id", "R_kgDOQZcXwg");
+      script.setAttribute("data-category", "General");
+      script.setAttribute("data-category-id", "DIC_kwDOQZcXws4CzGny");
+      script.setAttribute("data-mapping", "pathname");
+      script.setAttribute("data-strict", "0");
+      script.setAttribute("data-reactions-enabled", "1");
+      script.setAttribute("data-emit-metadata", "0");
+      script.setAttribute("data-input-position", "bottom");
+      script.setAttribute("data-theme", "dark");
+      script.setAttribute("data-lang", "zh-CN");
+      script.setAttribute("crossorigin", "anonymous");
+      script.async = true;
+
+      var giscusContainer = document.querySelector(".giscus");
+      if (giscusContainer) {
+        giscusContainer.appendChild(script);
       }
     })();
   </script>
