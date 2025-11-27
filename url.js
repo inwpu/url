@@ -209,7 +209,7 @@ const HTML = `<!DOCTYPE html>
     }
     .field small {
       display: block;
-      font-size: 11px;
+      font-size: 13px;
       color: #9ca3af;
       margin-top: 2px;
     }
@@ -570,7 +570,7 @@ const HTML = `<!DOCTYPE html>
         font-size: 12px;
       }
       .field small {
-        font-size: 10px;
+        font-size: 12px;
       }
       input, textarea {
         font-size: 12px;
