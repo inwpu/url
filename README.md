@@ -86,15 +86,6 @@ https://hxorz.cn/gh/microsoft/vscode
 
 直接粘贴完整的安装命令：
 
-**Docker 命令**
-```bash
-docker pull nginx:latest
-```
-转换为：
-```bash
-docker pull hub.hxorz.cn/nginx:latest
-```
-
 **Git Clone 命令**
 ```bash
 git clone https://github.com/microsoft/vscode
@@ -137,7 +128,9 @@ curl -L https://hxorz.cn/gh/user/repo/releases/download/v1.0.0/file.tar.gz
 
 ## Docker 镜像加速配置
 
-本工具还提供 Docker 镜像加速配置说明，支持多种操作系统。
+注意：Docker 镜像不支持 URL 直接转换，推荐直接配置 Docker 镜像源。配置后无需修改任何 docker pull 命令，即可自动使用加速服务。
+
+本工具提供完整的 Docker 镜像加速配置说明，支持多种操作系统。
 
 ### Linux 系统配置
 
@@ -305,11 +298,13 @@ MIT License
 
 ### v1.1.0 (2025-01)
 - 新增命令识别和自动转换功能
-- 支持 docker pull、git clone、npm install、pip install 等命令
+- 支持 git clone、npm install、pip install 等命令
 - 修复 URL 路径拼接的双斜杠问题
+- 修复 Cloudflare Workers 部署时的正则表达式转义问题
 - 优化 Docker 换源配置说明
 - 新增 macOS 和 Windows 配置方法
 - 改进验证命令说明
+- Docker 镜像改为推荐直接配置镜像源（不支持 URL 转换）
 
 ### v1.0.0 (初始版本)
 - 基础 URL 转换功能

@@ -672,8 +672,8 @@ const HTML = `<!DOCTYPE html>
 
         <div class="field">
           <label for="originalUrl">原始 URL 或命令</label>
-          <textarea id="originalUrl" placeholder="粘贴 URL 链接或输入命令（支持 docker pull / git clone / npm install / pip install 等）"></textarea>
-          <small>支持 URL 链接和安装命令，自动识别平台并生成加速版本。例如：docker pull nginx、git clone https://github.com/xxx/xxx、npm install react 等。</small>
+          <textarea id="originalUrl" placeholder="粘贴 URL 链接或输入命令（支持 git clone / npm install / pip install 等）"></textarea>
+          <small>支持 URL 链接和安装命令，自动识别平台并生成加速版本。例如：git clone https://github.com/xxx/xxx、npm install react、pip install requests 等。Docker 镜像请直接配置镜像源。</small>
         </div>
 
         <div class="field">
@@ -1271,21 +1271,12 @@ docker info</pre>
       if (!platform || !url) return "";
       const cmds = [];
       if (platform.id === "docker") {
-        const noScheme = url.replace(/^https?:\\/\\//i, "");
-        cmds.push("# Docker 拉取镜像");
-        cmds.push("docker pull " + noScheme);
+        cmds.push("# Docker 镜像加速");
+        cmds.push("# 不支持直接 URL 转换，请配置 Docker 镜像源");
+        cmds.push("# 详见页面下方的「Docker 镜像加速配置」说明");
         cmds.push("");
-        cmds.push("# 查看镜像信息");
-        cmds.push("docker images " + noScheme.split('/').pop().split(':')[0]);
-        cmds.push("");
-        cmds.push("# 运行容器（交互式）");
-        cmds.push("docker run -it --rm " + noScheme);
-        cmds.push("");
-        cmds.push("# 运行容器（后台模式）");
-        cmds.push("docker run -d --name mycontainer " + noScheme);
-        cmds.push("");
-        cmds.push("# 使用 docker-compose（需自行创建 docker-compose.yml）");
-        cmds.push("docker-compose pull && docker-compose up -d");
+        cmds.push("# 配置镜像源后，可直接使用原始命令拉取镜像");
+        cmds.push("# 例如：docker pull " + url.replace(/^https?:\\/\\/[^/]+\\//, ''));
       } else if (["github","gist","gitlab","gitea","codeberg","sf","aosp","homebrew"].includes(platform.id)) {
         // 判断是否为文件下载链接
         const isFileLink = /\\.(zip|tar\\.gz|tgz|tar\\.bz2|tar\\.xz|exe|dmg|pkg|deb|rpm|apk|jar|war)$/i.test(url) || url.includes('/releases/download/') || url.includes('/archive/');
@@ -1460,24 +1451,6 @@ docker info</pre>
     function detectAndConvertCommand(input) {
       input = input.trim();
 
-      // Docker 命令识别
-      const dockerPullMatch = input.match(/docker\s+pull\s+([^\s]+)/i);
-      if (dockerPullMatch) {
-        const imageName = dockerPullMatch[1];
-        // 如果已经包含加速域名，直接返回
-        if (imageName.includes('hub.hxorz.cn')) {
-          return { isCommand: true, converted: input, platform: 'docker', original: imageName };
-        }
-        // 转换为加速镜像
-        const acceleratedImage = 'hub.hxorz.cn/' + imageName.replace(/^(docker\.io\/|registry-1\.docker\.io\/)?/, '');
-        return {
-          isCommand: true,
-          converted: input.replace(imageName, acceleratedImage),
-          platform: 'docker',
-          original: imageName
-        };
-      }
-
       // Git clone 命令识别 (支持各种参数)
       const gitCloneMatch = input.match(/git\s+clone\s+(?:(?:--?\w+(?:[=\s]+[^\s]+)?)\s+)*(https?:\/\/[^\s]+)/i);
       if (gitCloneMatch) {
@@ -1507,7 +1480,7 @@ docker info</pre>
       }
 
       // npm install 命令识别
-      const npmInstallMatch = input.match(/npm\s+install\s+(?:-[gD]\s+)?(['"]?)([^\s'"]+)\1/i);
+      const npmInstallMatch = input.match(/npm\s+install\s+(?:-[gD]\s+)?(['"]?)([^\s'"]+)\\1/i);
       if (npmInstallMatch) {
         const packageSpec = npmInstallMatch[2];
         // 如果是URL格式
@@ -1536,7 +1509,7 @@ docker info</pre>
       }
 
       // pip install 命令识别
-      const pipInstallMatch = input.match(/pip(?:3)?\s+install\s+(?:-[^\s]+\s+)*(['"]?)([^\s'"]+)\1/i);
+      const pipInstallMatch = input.match(/pip(?:3)?\s+install\s+(?:-[^\s]+\s+)*(['"]?)([^\s'"]+)\\1/i);
       if (pipInstallMatch) {
         const packageSpec = pipInstallMatch[2];
         // 如果是URL格式
@@ -1567,7 +1540,7 @@ docker info</pre>
       }
 
       // curl/wget 下载命令识别
-      const curlMatch = input.match(/(?:curl|wget)\s+(?:-[^\s]+\s+)*(['"]?)([^\s'"]+)\1/i);
+      const curlMatch = input.match(/(?:curl|wget)\s+(?:-[^\s]+\s+)*(['"]?)([^\s'"]+)\\1/i);
       if (curlMatch) {
         const urlStr = curlMatch[2];
         try {
